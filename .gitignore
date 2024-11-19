@@ -1,0 +1,43 @@
+# Compiled source
+HomeCook.Api/bin/
+HomeCook.Api/obj/
+debug.log 
+
+# dependencies
+node_modules/
+
+# production
+build/
+
+# User-specific files
+*.csproj.user
+*.user
+.vs/
+.vscode/
+.idea/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.svclog
+
+# Dependency cache
+packages/
+*.nupkg
+project.lock.json
+
+# Environment-specific files
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Rider
+.idea/
+
+
+README.md
