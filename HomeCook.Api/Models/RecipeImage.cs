@@ -2,7 +2,7 @@
 {
     public class RecipeImage
     {
-        public Guid id { get; set; }
-        public string Image { get; set; }
+        public Guid Id { get; set; }
+        public required string Image { get; set; }
     }
 }
