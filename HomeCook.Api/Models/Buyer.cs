@@ -1,10 +1,8 @@
-﻿using HomeCook.Api.Enums;
-
-namespace HomeCook.Api.Models
+﻿namespace HomeCook.Api.Models
 {
     public class Buyer : User
     {
-        public UserRole Role { get; set; }
+        public List<Food> Foods { get; set; } = new List<Food>();
 
     }
 }
