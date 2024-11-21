@@ -10,7 +10,7 @@
         public required string PostCode { get; set; }
         public string? Bio { get; set; }
         public string? ProfileImage { get; set; }
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         public required User User { get; set; }
     }
 }
