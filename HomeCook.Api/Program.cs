@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using HomeCook.Api.EntityFramework;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Services;
+using HomeCook.Api.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ options.UseNpgsql(connectionString));
 
 builder.Services.AddScoped <ICategoriesReposity, CategoriesRepository>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+
+builder.Services.AddAutoMapper(typeof(AutoMapping));
 
 var app = builder.Build();
 
