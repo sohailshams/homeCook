@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using HomeCook.Api.DTOs;
 using HomeCook.Api.EntityFramework.Repositories;
-using HomeCook.Api.Models;
 
 namespace HomeCook.Api.Services
 {
