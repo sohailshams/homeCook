@@ -1,3 +1,4 @@
+using HomeCook.Api.DTOs;
 using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,14 @@ namespace HomeCook.Api.Controllers
         {
             var categories = await _categoriesService.GetCategoriesAsync();
             return Ok(categories);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddCategory([FromBody] AddCategoryDTO addCategory)
+        {
+            var newCategory = await _categoriesService.AddCategoryAsync(addCategory);
+
+            return Ok(newCategory);
         }
     }
 }
