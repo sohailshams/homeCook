@@ -8,6 +8,7 @@ namespace HomeCook.Api.Mappings
         public AutoMapping()
         {
             CreateMap<Category, CategoryDTO>().ReverseMap();
+            CreateMap<AddCategoryDTO, Category>().ReverseMap();
         }
     }
 }
