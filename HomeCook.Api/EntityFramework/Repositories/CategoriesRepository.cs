@@ -16,5 +16,13 @@ namespace HomeCook.Api.EntityFramework.Repositories
             var categories = await dbContext.Categories.ToListAsync();
             return categories;
         }
+
+        public async Task<Category> AddCategoryAsync(Category category)
+        {
+            await dbContext.Categories.AddAsync(category);
+            await dbContext.SaveChangesAsync();
+            return category;
+        }
+
     }
 }
