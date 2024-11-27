@@ -3,6 +3,7 @@ using HomeCook.Api.EntityFramework;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Services;
 using HomeCook.Api.Mappings;
+using HomeCook.Api.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
