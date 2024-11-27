@@ -1,4 +1,6 @@
-﻿namespace HomeCook.Api.Exceptions
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HomeCook.Api.Exceptions
 {
     public class GlobalExceptionHandlerMiddleware
     {
@@ -34,6 +36,11 @@
             {
                 case DatabaseOperationException dbEx:
                     statusCode = StatusCodes.Status500InternalServerError;
+                    errorMessage = dbEx.Message;
+                    break;
+
+                case ValidationException dbEx:
+                    statusCode = StatusCodes.Status400BadRequest;
                     errorMessage = dbEx.Message;
                     break;
 
