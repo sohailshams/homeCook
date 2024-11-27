@@ -17,6 +17,12 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return categories;
         }
 
+        public async Task<Category?> GetCategoryByIdAsync(Guid categoryId)
+        {
+            var existingCategory = await dbContext.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            return existingCategory;
+        }
+
         public async Task<Category> AddCategoryAsync(Category category)
         {
             await dbContext.Categories.AddAsync(category);
