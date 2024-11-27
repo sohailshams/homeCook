@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
-    public class CategoriesRepository : ICategoriesReposity
+    public class CategoryRepository : ICategoryReposity
     {
         private readonly AppDbContext dbContext;
-        public CategoriesRepository(AppDbContext dbContext)
+        public CategoryRepository(AppDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

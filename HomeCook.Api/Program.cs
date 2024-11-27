@@ -18,8 +18,8 @@ var connectionString = builder.Configuration.GetConnectionString("DbConnection")
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseNpgsql(connectionString));
 
-builder.Services.AddScoped <ICategoriesReposity, CategoriesRepository>();
-builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+builder.Services.AddScoped <ICategoryReposity, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 

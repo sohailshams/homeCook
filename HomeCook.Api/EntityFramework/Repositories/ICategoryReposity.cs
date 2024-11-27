@@ -2,7 +2,7 @@
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
-    public interface ICategoriesReposity
+    public interface ICategoryReposity
     {
         Task<List<Category>> GetCategoriesAsync();
         Task<Category?> GetCategoryByIdAsync(Guid id);

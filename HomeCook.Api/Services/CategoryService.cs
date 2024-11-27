@@ -3,18 +3,17 @@ using HomeCook.Api.DTOs;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace HomeCook.Api.Services
 {
-    public class CategoriesService : ICategoriesService
+    public class CategoryService : ICategoryService
     {
-        private readonly ICategoriesReposity _categoriesReposity;
+        private readonly ICategoryReposity _categoriesReposity;
         private readonly IMapper _mapper;
 
-        public CategoriesService(ICategoriesReposity categoriesReposity, IMapper mapper)
+        public CategoryService(ICategoryReposity categoriesReposity, IMapper mapper)
         {
             _categoriesReposity = categoriesReposity;
             _mapper = mapper;

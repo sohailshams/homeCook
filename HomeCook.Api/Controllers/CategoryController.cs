@@ -6,12 +6,12 @@ namespace HomeCook.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class CategoryController : ControllerBase
     {
-        private readonly ILogger<CategoriesController> _logger;
-        private readonly ICategoriesService _categoriesService;
+        private readonly ILogger<CategoryController> _logger;
+        private readonly ICategoryService _categoriesService;
 
-        public CategoriesController(ILogger<CategoriesController> logger, ICategoriesService categoriesService)
+        public CategoryController(ILogger<CategoryController> logger, ICategoryService categoriesService)
         {
             _logger = logger;
             _categoriesService = categoriesService;
