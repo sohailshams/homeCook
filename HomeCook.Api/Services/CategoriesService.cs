@@ -1,7 +1,11 @@
 ﻿using AutoMapper;
 using HomeCook.Api.DTOs;
 using HomeCook.Api.EntityFramework.Repositories;
+using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace HomeCook.Api.Services
 {
@@ -28,6 +32,14 @@ namespace HomeCook.Api.Services
 
         public async Task<CategoryDTO> AddCategoryAsync(AddCategoryDTO addCategory)
         {
+            var existingCategory = await _categoriesReposity.GetCategoryByIdAsync(addCategory.Id);
+            if (existingCategory != null)
+            {
+                throw new ValidationException("A category with the same ID already exists.");
+            }
+
+            try
+            {
             // Convert AddCategoryDTO to model
             var categoryModel = _mapper.Map<Category>(addCategory);
 
@@ -38,6 +50,11 @@ namespace HomeCook.Api.Services
             var categoryDto = _mapper.Map<CategoryDTO>(newCategory);
 
             return categoryDto;
+
+            } catch (DbUpdateException exception)
+            {
+                throw new DatabaseOperationException("Failed to create category.", exception);
+            }
 
         }
     }
