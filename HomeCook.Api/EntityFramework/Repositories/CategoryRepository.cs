@@ -30,5 +30,14 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return category;
         }
 
+        public async Task<Category?> DeleteCategoryAsync(Guid categoryId)
+        {
+            var category = await GetCategoryByIdAsync(categoryId);
+            if (category == null) return null;
+
+            dbContext.Remove(category);
+            await dbContext.SaveChangesAsync();
+            return category;
+        }
     }
 }
