@@ -31,5 +31,19 @@ namespace HomeCook.Api.Controllers
 
             return Ok(newCategory);
         }
+
+
+        [HttpDelete]
+        [Route("{categoryId:Guid}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId)
+        {
+            var category = await _categoriesService.DeleteCategoryByIdAsync(categoryId);
+
+            return Ok(new
+            {
+                Message = "Category deleted successfully",
+                Category = category
+            });
+        }
     }
 }
