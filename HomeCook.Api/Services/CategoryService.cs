@@ -56,5 +56,23 @@ namespace HomeCook.Api.Services
             }
 
         }
+
+        public async Task<CategoryDTO> DeleteCategoryByIdAsync(Guid categoryId)
+        {
+            try
+            {
+                var category = await _categoriesReposity.DeleteCategoryAsync(categoryId) ?? throw new ValidationException("Category not found.");
+
+                //Map model to DTO
+                var categoryDto = _mapper.Map<CategoryDTO>(category);
+                return categoryDto;
+
+            } catch(DbUpdateException exception)
+            {
+                throw new DatabaseOperationException("Failed to delete category.", exception);
+
+            }
+
+        }
     }
 }
