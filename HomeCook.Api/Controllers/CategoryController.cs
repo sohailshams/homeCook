@@ -33,6 +33,19 @@ namespace HomeCook.Api.Controllers
         }
 
 
+        [HttpPut]
+        [Route("{categoryId:Guid}")]
+        public async Task<IActionResult> UpdateCategory([FromRoute] Guid categoryId, [FromBody] AddCategoryDTO updatedCategory)
+        {
+            var category = await _categoriesService.UpdateCategoryByIdAsync(categoryId, updatedCategory);
+
+            return Ok(new
+            {
+                Message = "Category updated successfully",
+                Category = category
+            });
+        }
+
         [HttpDelete]
         [Route("{categoryId:Guid}")]
         public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId)
