@@ -6,6 +6,7 @@ namespace HomeCook.Api.Services
     {
         public Task<List<CategoryDTO>> GetCategoriesAsync();
         public Task<CategoryDTO> AddCategoryAsync(AddCategoryDTO addCategory);
+        public Task<CategoryDTO> UpdateCategoryByIdAsync(Guid categoryId, AddCategoryDTO updateCategory);
         public Task<CategoryDTO> DeleteCategoryByIdAsync(Guid categoryId);
     }
 }
