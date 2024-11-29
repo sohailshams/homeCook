@@ -23,11 +23,24 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return existingCategory;
         }
 
-        public async Task<Category> AddCategoryAsync(Category category)
+        public async Task<Category?> AddCategoryAsync(Category category)
         {
+            var isExistingCategory = await dbContext.Categories.AnyAsync(c => c.Name.ToLower() == category.Name.ToLower());
+            if (isExistingCategory) return null;
+
             await dbContext.Categories.AddAsync(category);
             await dbContext.SaveChangesAsync();
             return category;
+        }
+
+        public async Task<Category?> UpdateCategoryAsync(Guid categoryId, Category upateCategory)
+        {
+            var existingCategory = await GetCategoryByIdAsync(categoryId);
+            if (existingCategory == null) return null;
+
+            existingCategory.Name = upateCategory.Name;
+            await dbContext.SaveChangesAsync();
+            return existingCategory;
         }
 
         public async Task<Category?> DeleteCategoryAsync(Guid categoryId)
