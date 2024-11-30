@@ -25,7 +25,7 @@ namespace HomeCook.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] AddCategoryDTO addCategory)
+        public async Task<IActionResult> AddCategory([FromBody] AddUpdateCategoryDTO addCategory)
         {
             var newCategory = await _categoriesService.AddCategoryAsync(addCategory);
 
@@ -35,7 +35,7 @@ namespace HomeCook.Api.Controllers
 
         [HttpPut]
         [Route("{categoryId:Guid}")]
-        public async Task<IActionResult> UpdateCategory([FromRoute] Guid categoryId, [FromBody] AddCategoryDTO updatedCategory)
+        public async Task<IActionResult> UpdateCategory([FromRoute] Guid categoryId, [FromBody] AddUpdateCategoryDTO updatedCategory)
         {
             var category = await _categoriesService.UpdateCategoryByIdAsync(categoryId, updatedCategory);
 

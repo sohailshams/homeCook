@@ -29,7 +29,7 @@ namespace HomeCook.Api.Services
             return categoriesDto;
         }
 
-        public async Task<CategoryDTO> AddCategoryAsync(AddCategoryDTO addCategory)
+        public async Task<CategoryDTO> AddCategoryAsync(AddUpdateCategoryDTO addCategory)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace HomeCook.Api.Services
         }
 
 
-        public async Task<CategoryDTO> UpdateCategoryByIdAsync(Guid categoryId, AddCategoryDTO updateCategory)
+        public async Task<CategoryDTO> UpdateCategoryByIdAsync(Guid categoryId, AddUpdateCategoryDTO updateCategory)
         {
             try
             {
