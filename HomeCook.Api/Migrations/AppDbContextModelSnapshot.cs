@@ -35,18 +35,6 @@ namespace HomeCook.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("710de10b-cdf9-4b9f-a345-14d0703c4e07"),
-                            Name = "Asian"
-                        },
-                        new
-                        {
-                            Id = new Guid("78845a1b-67c9-469e-813b-834cbe52a2df"),
-                            Name = "Dessert"
-                        });
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Food", b =>
@@ -58,8 +46,8 @@ namespace HomeCook.Api.Migrations
                     b.Property<DateTime>("AvailableDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("BuyerId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("BuyerId")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uuid");
@@ -85,8 +73,9 @@ namespace HomeCook.Api.Migrations
                     b.Property<int>("QuantityAvailable")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("SellerId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -97,34 +86,6 @@ namespace HomeCook.Api.Migrations
                     b.HasIndex("SellerId");
 
                     b.ToTable("Foods");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("15ccf961-41c6-4b98-b454-37d79b3b4596"),
-                            AvailableDate = new DateTime(2024, 11, 22, 17, 55, 58, 148, DateTimeKind.Utc).AddTicks(6221),
-                            CategoryId = new Guid("710de10b-cdf9-4b9f-a345-14d0703c4e07"),
-                            Description = "Cheese pizza with tomato sauce",
-                            FoodImageId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            Ingredients = "Flour, Cheese, Tomato Sauce",
-                            Name = "Pizza",
-                            Price = 12.99m,
-                            QuantityAvailable = 0,
-                            SellerId = new Guid("f6fa2df0-a483-4879-8528-d9621521ee33")
-                        },
-                        new
-                        {
-                            Id = new Guid("8c410b0e-5f57-43d6-8fbe-69722a5eb053"),
-                            AvailableDate = new DateTime(2024, 11, 23, 17, 55, 58, 148, DateTimeKind.Utc).AddTicks(6234),
-                            CategoryId = new Guid("78845a1b-67c9-469e-813b-834cbe52a2df"),
-                            Description = "Delicious chocolate brownie",
-                            FoodImageId = new Guid("00000000-0000-0000-0000-000000000000"),
-                            Ingredients = "Chocolate, Flour, Sugar, Butter",
-                            Name = "Brownie",
-                            Price = 5.99m,
-                            QuantityAvailable = 0,
-                            SellerId = new Guid("f6fa2df0-a483-4879-8528-d9621521ee33")
-                        });
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.FoodImage", b =>
@@ -153,8 +114,9 @@ namespace HomeCook.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("BuyerId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("BuyerId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("FoodId")
                         .HasColumnType("uuid");
@@ -162,8 +124,9 @@ namespace HomeCook.Api.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("SellerId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("SellerId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<decimal>("TotalPrice")
                         .HasColumnType("numeric");
@@ -238,8 +201,9 @@ namespace HomeCook.Api.Migrations
                     b.Property<string>("ProfileImage")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -247,38 +211,19 @@ namespace HomeCook.Api.Migrations
                         .IsUnique();
 
                     b.ToTable("Profiles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("27a550fd-4a76-4997-9ad4-c530ab0cac0b"),
-                            Address = "123 Seller Street",
-                            City = "New York",
-                            Country = "USA",
-                            PhoneNumber = "1234567890",
-                            PostCode = "10001",
-                            UserId = new Guid("f6fa2df0-a483-4879-8528-d9621521ee33")
-                        },
-                        new
-                        {
-                            Id = new Guid("479dbf36-3f3d-4b1b-a7bf-b1922bb15ec6"),
-                            Address = "456 Buyer Avenue",
-                            City = "Los Angeles",
-                            Country = "USA",
-                            PhoneNumber = "0987654321",
-                            PostCode = "90001",
-                            UserId = new Guid("182f53a1-f29b-425e-91e0-1581cb9e319d")
-                        });
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.User", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -286,27 +231,194 @@ namespace HomeCook.Api.Migrations
                         .HasColumnType("character varying(8)");
 
                     b.Property<string>("Email")
-                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers", (string)null);
 
                     b.HasDiscriminator().HasValue("User");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("NormalizedName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique()
+                        .HasDatabaseName("RoleNameIndex");
+
+                    b.ToTable("AspNetRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetRoleClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClaimType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClaimValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserClaims", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderKey")
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProviderDisplayName")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("LoginProvider", "ProviderKey");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AspNetUserLogins", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("RoleId")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("AspNetUserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("AspNetUserTokens", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Buyer", b =>
@@ -314,17 +426,6 @@ namespace HomeCook.Api.Migrations
                     b.HasBaseType("HomeCook.Api.Models.User");
 
                     b.HasDiscriminator().HasValue("Buyer");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("182f53a1-f29b-425e-91e0-1581cb9e319d"),
-                            CreatedAt = new DateTime(2024, 11, 21, 17, 55, 58, 148, DateTimeKind.Utc).AddTicks(6022),
-                            Email = "jane.smith@example.com",
-                            FirstName = "Jane",
-                            LastName = "Smith",
-                            Role = 1
-                        });
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Seller", b =>
@@ -332,17 +433,6 @@ namespace HomeCook.Api.Migrations
                     b.HasBaseType("HomeCook.Api.Models.User");
 
                     b.HasDiscriminator().HasValue("Seller");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("f6fa2df0-a483-4879-8528-d9621521ee33"),
-                            CreatedAt = new DateTime(2024, 11, 21, 17, 55, 58, 148, DateTimeKind.Utc).AddTicks(6010),
-                            Email = "john.doe@example.com",
-                            FirstName = "John",
-                            LastName = "Doe",
-                            Role = 2
-                        });
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Food", b =>
@@ -434,6 +524,57 @@ namespace HomeCook.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+                {
+                    b.HasOne("HomeCook.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+                {
+                    b.HasOne("HomeCook.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HomeCook.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+                {
+                    b.HasOne("HomeCook.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Food", b =>
