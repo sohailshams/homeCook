@@ -4,6 +4,10 @@ using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Services;
 using HomeCook.Api.Mappings;
 using HomeCook.Api.Exceptions;
+using HomeCook.Api.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,9 @@ builder.Services.AddSwaggerGen();
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseNpgsql(connectionString));
+
+builder.Services.AddIdentityApiEndpoints<User>()
+    .AddEntityFrameworkStores<AppDbContext>();
 
 builder.Services.AddScoped <ICategoryReposity, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
@@ -34,6 +41,8 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
+
+app.MapIdentityApi<User>();
 
 app.UseAuthorization();
 
