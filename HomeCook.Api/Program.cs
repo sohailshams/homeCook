@@ -42,7 +42,7 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.MapIdentityApi<User>();
+app.MapGroup("api").MapIdentityApi<User>();
 
 app.UseAuthorization();
 
