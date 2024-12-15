@@ -9,7 +9,7 @@
         public required string Description { get; set; }
         public required string Ingredients { get; set; }
         public int QuantityAvailable { get; set; }
-        public Guid SellerId { get; set; } 
+        public required string SellerId { get; set; } 
         public required Seller Seller { get; set; }
         public Guid FoodImageId { get; set; }
         public Guid CategoryId { get; set; }
