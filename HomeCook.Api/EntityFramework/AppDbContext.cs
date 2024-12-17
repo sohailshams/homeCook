@@ -10,8 +10,6 @@ namespace HomeCook.Api.EntityFramework
         //{
 
         //}
-        public DbSet<Seller> Sellers { get; set; }
-        public DbSet<Buyer> Buyers { get; set; }
         public DbSet<Profile> Profiles { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Food> Foods { get; set; }
