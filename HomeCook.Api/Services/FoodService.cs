@@ -5,6 +5,7 @@ using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace HomeCook.Api.Services
 {
@@ -15,14 +16,16 @@ namespace HomeCook.Api.Services
         public readonly ICategoryService _categoryService;
         public readonly IUserRepository _userRepository;
         private readonly ICategoryReposity _categoryReposity;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FoodService(IFoodRepository foodRepository, IMapper mapper, ICategoryService categoryService, IUserRepository userRepository, ICategoryReposity categoryReposity)
+        public FoodService(IFoodRepository foodRepository, IMapper mapper, ICategoryService categoryService, IUserRepository userRepository, ICategoryReposity categoryReposity, IHttpContextAccessor httpContextAccessor)
         {
             _foodRepository = foodRepository;
             _mapper = mapper;
             _categoryService = categoryService;
             _userRepository = userRepository;
             _categoryReposity = categoryReposity;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<List<FoodDTO>> GetFoodListAsync()
@@ -39,7 +42,12 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                // TODO: Remember to check if logged in user is the same as seller
+                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+
+                if (loggedInUserId != addFoodDTO.SellerId)
+                {
+                    throw new UnauthorizedAccessException("You are not authorized to create a food.");
+                }
 
                 // Convert addFoodDTO to model
                 var foodModel = _mapper.Map<Food>(addFoodDTO);
