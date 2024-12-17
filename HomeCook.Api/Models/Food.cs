@@ -10,10 +10,10 @@
         public required string Ingredients { get; set; }
         public int QuantityAvailable { get; set; }
         public required string SellerId { get; set; } 
-        public required Seller Seller { get; set; }
-        public Guid FoodImageId { get; set; }
-        public Guid CategoryId { get; set; }
+        public required User Seller { get; set; }
+        public Guid? FoodImageId { get; set; }
         public List<FoodImage>? FoodImage { get; set; }
+        public Guid CategoryId { get; set; }
         public required Category Category { get; set; }
     }
 }
