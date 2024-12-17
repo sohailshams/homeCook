@@ -1,4 +1,5 @@
-﻿using HomeCook.Api.Services;
+﻿using HomeCook.Api.DTOs;
+using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCook.Api.Controllers
@@ -21,6 +22,13 @@ namespace HomeCook.Api.Controllers
         {
             var food = await _foodService.GetFoodListAsync();
             return Ok(food);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddFood([FromBody] AddFoodDTO addFood)
+        {
+            var newFood = await _foodService.AddFoodAsync(addFood);
+            return Ok(newFood);
         }
     }
 }
