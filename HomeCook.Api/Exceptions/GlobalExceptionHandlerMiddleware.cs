@@ -43,6 +43,10 @@ namespace HomeCook.Api.Exceptions
                     statusCode = StatusCodes.Status400BadRequest;
                     errorMessage = dbEx.Message;
                     break;
+                case UnauthorizedAccessException dbEx:
+                    statusCode = StatusCodes.Status401Unauthorized;
+                    errorMessage = dbEx.Message;
+                    break;
 
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;
