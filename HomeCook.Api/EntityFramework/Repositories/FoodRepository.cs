@@ -11,9 +11,17 @@ namespace HomeCook.Api.EntityFramework.Repositories
         {
             this.dbContext = dbContext;
         }
+
         public async Task<List<Food>> GetFoodListAsync()
         {
             var food = await dbContext.Foods.ToListAsync();
+            return food;
+        }
+
+        public async Task<Food> AddFoodAsync(Food food)
+        {
+            await dbContext.Foods.AddAsync(food);
+            await dbContext.SaveChangesAsync();
             return food;
         }
     }
