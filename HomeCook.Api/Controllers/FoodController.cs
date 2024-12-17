@@ -1,5 +1,6 @@
 ﻿using HomeCook.Api.DTOs;
 using HomeCook.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCook.Api.Controllers
@@ -25,9 +26,10 @@ namespace HomeCook.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> AddFood([FromBody] AddFoodDTO addFood)
         {
-            var newFood = await _foodService.AddFoodAsync(addFood);
+             var newFood = await _foodService.AddFoodAsync(addFood);
             return Ok(newFood);
         }
     }
