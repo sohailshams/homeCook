@@ -47,6 +47,7 @@ builder.Services.AddScoped <ICategoryReposity, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodService, FoodService>();
+builder.Services.AddScoped<IUserRepository,  UserRepository>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
