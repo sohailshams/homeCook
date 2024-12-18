@@ -1,4 +1,5 @@
 ﻿using HomeCook.Api.DTOs;
+using HomeCook.Api.Models;
 using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +41,18 @@ namespace HomeCook.Api.Controllers
         {
              var newFood = await _foodService.AddFoodAsync(addFood);
             return Ok(newFood);
+        }
+
+        [HttpDelete]
+        [Route("{foodId:Guid}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteFood([FromRoute] Guid foodId)
+        {
+            var food = await _foodService.DeleteFoodByIdAsync(foodId);
+            return Ok(new {
+                Message = "Food deleted successfully",
+                Food = food
+            });
         }
     }
 }
