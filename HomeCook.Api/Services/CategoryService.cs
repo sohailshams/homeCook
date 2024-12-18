@@ -76,7 +76,7 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var category = await _categoriesReposity.DeleteCategoryAsync(categoryId) ?? throw new ValidationException("Category not found.");
+                var category = await _categoriesReposity.DeleteCategoryAsync(categoryId) ?? throw new NotFoundException("Category not found.");
 
                 //Map model to DTO
                 var categoryDto = _mapper.Map<CategoryDTO>(category);
