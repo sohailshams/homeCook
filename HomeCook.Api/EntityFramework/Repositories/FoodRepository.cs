@@ -33,6 +33,17 @@ namespace HomeCook.Api.EntityFramework.Repositories
             await dbContext.SaveChangesAsync();
             return food;
         }
-        
+
+        public async Task<Food?> DeleteFoodByIdAsync(Guid foodId, string sellerId)
+        {
+            var food = await GetFoodDetailAsync(foodId);
+            if (food == null) return null;
+
+            if (food.SellerId != sellerId) { throw new UnauthorizedAccessException("You are not authorized to delete this food item."); }
+
+            dbContext.Remove(food);
+            await dbContext.SaveChangesAsync();
+            return food;
+        }
     }
 }

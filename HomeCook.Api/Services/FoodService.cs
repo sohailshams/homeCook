@@ -89,5 +89,21 @@ namespace HomeCook.Api.Services
                 throw new DatabaseOperationException("Failed to create food.", exception);
             }
         }
+
+        public async Task<FoodDTO> DeleteFoodByIdAsync(Guid foodId)
+        {
+            try
+            {
+                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+
+                var food = await _foodRepository.DeleteFoodByIdAsync(foodId, loggedInUserId) ?? throw new NotFoundException("Food not found.");
+                // Map Food model to FoodDTO
+                var foodDto = _mapper.Map<FoodDTO>(food);
+                return foodDto;
+            } catch (DbUpdateException exception)
+            {
+                throw new DatabaseOperationException("Failed to delete food.", exception);
+            }
+        }
     }
 }
