@@ -11,6 +11,7 @@ namespace HomeCook.Api.Mappings
             CreateMap<AddUpdateCategoryDTO, Category>().ReverseMap();
             CreateMap<Food, FoodDTO>().ReverseMap();
             CreateMap<AddFoodDTO, Food>().ReverseMap();
+            CreateMap<FoodDetailDTO, Food>().ReverseMap();
 
 
         }
