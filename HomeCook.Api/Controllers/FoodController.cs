@@ -25,6 +25,15 @@ namespace HomeCook.Api.Controllers
             return Ok(food);
         }
 
+        [HttpGet]
+        [Route("{foodId:Guid}")]
+        public async Task<IActionResult> GetFoodDetail([FromRoute] Guid foodId)
+        {
+            var foodDetail = await _foodService.GetFoodDetailAsync(foodId);
+
+            return Ok(foodDetail);
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> AddFood([FromBody] AddFoodDTO addFood)
