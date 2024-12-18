@@ -1,4 +1,5 @@
-﻿using HomeCook.Api.Models;
+﻿using HomeCook.Api.DTOs;
+using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeCook.Api.EntityFramework.Repositories
@@ -14,8 +15,16 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodListAsync()
         {
-            var food = await dbContext.Foods.ToListAsync();
+            var food = await dbContext.Foods.Include("Category").ToListAsync();
             return food;
+        }
+
+
+        public async Task<Food?> GetFoodDetailAsync(Guid foodId)
+        {
+            var foodDetail = await dbContext.Foods.Include("Category").FirstOrDefaultAsync(f => f.Id == foodId);
+            
+            return foodDetail;
         }
 
         public async Task<Food> AddFoodAsync(Food food)
@@ -24,5 +33,6 @@ namespace HomeCook.Api.EntityFramework.Repositories
             await dbContext.SaveChangesAsync();
             return food;
         }
+        
     }
 }

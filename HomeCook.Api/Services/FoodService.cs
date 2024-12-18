@@ -3,7 +3,9 @@ using HomeCook.Api.DTOs;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -38,6 +40,21 @@ namespace HomeCook.Api.Services
             return foodDto;
         }
 
+        public async Task<FoodDetailDTO?> GetFoodDetailAsync(Guid id)
+        {
+            try
+            {
+                var foodDetail = await _foodRepository.GetFoodDetailAsync(id) ?? throw new NotFoundException("Food not found.");
+                // map Food model to FoodDetailDTO
+                var foodDetailDTO = _mapper.Map<FoodDetailDTO>(foodDetail);
+                return foodDetailDTO;
+
+            } catch (Exception exception) when (exception is not NotFoundException)
+            {
+                throw new DatabaseOperationException("An unexpected error occurred while retrieving food details.", exception);
+            }
+        }
+
         public async Task<FoodDTO> AddFoodAsync(AddFoodDTO addFoodDTO)
         {
             try
@@ -52,10 +69,10 @@ namespace HomeCook.Api.Services
                 // Convert addFoodDTO to model
                 var foodModel = _mapper.Map<Food>(addFoodDTO);
 
-                var category = await _categoryReposity.GetCategoryByIdAsync(foodModel.CategoryId) ?? throw new ValidationException($"Category with ID {addFoodDTO.CategoryId} not found.");
+                var category = await _categoryReposity.GetCategoryByIdAsync(foodModel.CategoryId) ?? throw new NotFoundException($"Category with ID {addFoodDTO.CategoryId} not found.");
                 foodModel.Category = category;
 
-                var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new KeyNotFoundException($"Seller with ID {addFoodDTO.SellerId} not found.");
+                var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {addFoodDTO.SellerId} not found.");
                 foodModel.Seller = seller;
                 
                 // Use model to create food object in DB
