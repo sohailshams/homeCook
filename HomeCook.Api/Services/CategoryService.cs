@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HomeCook.Api.Services
 {
+    // TODO Only admin user can add, delete and update category
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryReposity _categoriesReposity;
