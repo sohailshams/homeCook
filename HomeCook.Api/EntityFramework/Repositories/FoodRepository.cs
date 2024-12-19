@@ -1,6 +1,8 @@
 ﻿using HomeCook.Api.DTOs;
+using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
@@ -22,7 +24,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<Food?> GetFoodDetailAsync(Guid foodId)
         {
-            var foodDetail = await dbContext.Foods.Include("Category").FirstOrDefaultAsync(f => f.Id == foodId);
+            var foodDetail = await dbContext.Foods.Include("Category").Include("FoodImage").FirstOrDefaultAsync(f => f.Id == foodId);
             
             return foodDetail;
         }
@@ -34,16 +36,36 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return food;
         }
 
-        public async Task<Food?> DeleteFoodByIdAsync(Guid foodId, string sellerId)
-        {
-            var food = await GetFoodDetailAsync(foodId);
-            if (food == null) return null;
+        public async Task<Food?> UpdateFoodAsync(Guid foodId, string loggedInUserId, Food updateFood)
+        {           
+            var existingFood = await GetFoodDetailAsync(foodId);
+            if (existingFood == null) return null;
 
-            if (food.SellerId != sellerId) { throw new UnauthorizedAccessException("You are not authorized to delete this food item."); }
+            if (existingFood.SellerId != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
+            existingFood.Name = updateFood.Name;
+            existingFood.Description = updateFood.Description;
+            existingFood.AvailableDate = updateFood.AvailableDate;
+            existingFood.QuantityAvailable = updateFood.QuantityAvailable;
+            existingFood.Price = updateFood.Price;
+            existingFood.CategoryId = updateFood.CategoryId;
+            existingFood.Ingredients = updateFood.Ingredients;
+            existingFood.SellerId = updateFood.SellerId;
+            existingFood.FoodImage = updateFood.FoodImage;
 
-            dbContext.Remove(food);
             await dbContext.SaveChangesAsync();
-            return food;
+            return existingFood;
+        }
+
+        public async Task<Food?> DeleteFoodByIdAsync(Guid foodId, string loggedInUserId)
+        {
+            var existingFood = await GetFoodDetailAsync(foodId);
+            if (existingFood == null) return null;
+
+            if (existingFood.SellerId != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to delete this food item."); }
+
+            dbContext.Remove(existingFood);
+            await dbContext.SaveChangesAsync();
+            return existingFood;
         }
     }
 }

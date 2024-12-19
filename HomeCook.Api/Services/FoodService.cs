@@ -55,7 +55,7 @@ namespace HomeCook.Api.Services
             }
         }
 
-        public async Task<FoodDTO> AddFoodAsync(AddFoodDTO addFoodDTO)
+        public async Task<FoodDTO> AddFoodAsync(AddUpdateFoodDTO addFoodDTO)
         {
             try
             {
@@ -87,6 +87,26 @@ namespace HomeCook.Api.Services
             catch (DbUpdateException exception)
             {
                 throw new DatabaseOperationException("Failed to create food.", exception);
+            }
+        }
+     
+        public async Task<FoodDTO> UpdateFoodAsync(Guid foodId, AddUpdateFoodDTO updateFood)
+        {
+            try
+            {
+                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+   
+                // Convert AddUpdateCategoryDTO to model
+                var foodModal = _mapper.Map<Food>(updateFood);
+                var updatedFood = await _foodRepository.UpdateFoodAsync(foodId, loggedInUserId, foodModal) ?? throw new NotFoundException("Food not found.");
+
+                // Convert Food model to FoodDTO
+                var updateFoodDto = _mapper.Map<FoodDTO>(updateFood);
+                return updateFoodDto;
+            }
+            catch (DbUpdateException exception)
+            {
+                throw new DatabaseOperationException("Failed to update food item.", exception);
             }
         }
 
