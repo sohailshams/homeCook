@@ -17,7 +17,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodListAsync()
         {
-            var food = await dbContext.Foods.Include("Category").ToListAsync();
+            var food = await dbContext.Foods.Include("Category").Include("FoodImage").ToListAsync();
             return food;
         }
 
@@ -29,10 +29,24 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return foodDetail;
         }
 
-        public async Task<Food> AddFoodAsync(Food food)
+        public async Task<Food> AddFoodAsync(Food food, List<string>? foodImageUrls = null)
         {
             await dbContext.Foods.AddAsync(food);
             await dbContext.SaveChangesAsync();
+
+            if (foodImageUrls != null && foodImageUrls.Count > 0)
+            {
+                var foodImages = foodImageUrls.Select(url => new FoodImage
+                {
+                    FoodId = food.Id, 
+                    Food = food,
+                    Image = url
+                }).ToList();
+
+                await dbContext.FoodImages.AddRangeAsync(foodImages);
+                await dbContext.SaveChangesAsync(); 
+            }
+
             return food;
         }
 

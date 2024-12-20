@@ -74,9 +74,11 @@ namespace HomeCook.Api.Services
 
                 var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {addFoodDTO.SellerId} not found.");
                 foodModel.Seller = seller;
+
+                var foodImageUrls = addFoodDTO?.FoodImageUrls;
                 
                 // Use model to create food object in DB
-                var newFood = await _foodRepository.AddFoodAsync(foodModel);
+                var newFood = await _foodRepository.AddFoodAsync(foodModel, foodImageUrls);
 
                 //Map model to DTO
                 var foodDto = _mapper.Map<FoodDTO>(newFood);
