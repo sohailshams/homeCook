@@ -3,6 +3,7 @@ using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
@@ -64,7 +65,21 @@ namespace HomeCook.Api.EntityFramework.Repositories
             existingFood.CategoryId = updateFood.CategoryId;
             existingFood.Ingredients = updateFood.Ingredients;
             existingFood.SellerId = updateFood.SellerId;
-            existingFood.FoodImage = updateFood.FoodImage;
+            if (updateFood.FoodImage != null && updateFood.FoodImage.Count > 0)
+            {
+                // Remove existing images
+                dbContext.FoodImages.RemoveRange(existingFood.FoodImage ?? []);
+                // Add new images
+                var newImages = updateFood.FoodImage.Select(img => new FoodImage
+                {
+                    FoodId = existingFood.Id, 
+                    Image = img.Image, 
+                    Food = existingFood
+                }).ToList();
+
+                await dbContext.FoodImages.AddRangeAsync(newImages); 
+            }
+
 
             await dbContext.SaveChangesAsync();
             return existingFood;
