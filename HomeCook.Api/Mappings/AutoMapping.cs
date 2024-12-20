@@ -13,7 +13,10 @@ namespace HomeCook.Api.Mappings
             .ForMember(dest => dest.FoodImageUrls, opt => opt.MapFrom(src => src.FoodImage != null
              ? src.FoodImage.Select(img => img.Image).ToList()
              : new List<string>()));
-            CreateMap<AddUpdateFoodDTO, Food>().ReverseMap();
+            CreateMap<AddUpdateFoodDTO, Food>()
+            .ForMember(dest => dest.FoodImage, opt => opt.MapFrom((src, dest) => src.FoodImageUrls != null
+             ? src.FoodImageUrls.Select(url => new FoodImage { Image = url, Food = dest }).ToList()
+             : new List<FoodImage>()));
             CreateMap<FoodDetailDTO, Food>().ReverseMap();
             CreateMap<AddUpdateFoodDTO, FoodDTO>();
 
