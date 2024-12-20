@@ -9,7 +9,10 @@ namespace HomeCook.Api.Mappings
         {
             CreateMap<Category, CategoryDTO>().ReverseMap();
             CreateMap<AddUpdateCategoryDTO, Category>().ReverseMap();
-            CreateMap<Food, FoodDTO>().ReverseMap();
+            CreateMap<Food, FoodDTO>()
+            .ForMember(dest => dest.FoodImageUrls, opt => opt.MapFrom(src => src.FoodImage != null
+             ? src.FoodImage.Select(img => img.Image).ToList()
+             : new List<string>()));
             CreateMap<AddUpdateFoodDTO, Food>().ReverseMap();
             CreateMap<FoodDetailDTO, Food>().ReverseMap();
             CreateMap<AddUpdateFoodDTO, FoodDTO>();
