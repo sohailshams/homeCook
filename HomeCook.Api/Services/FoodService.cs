@@ -44,9 +44,9 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var foodDetail = await _foodRepository.GetFoodDetailAsync(id) ?? throw new NotFoundException("Food not found.");
+                var food = await _foodRepository.GetFoodDetailAsync(id) ?? throw new NotFoundException("Food not found.");
                 // map Food model to FoodDetailDTO
-                var foodDetailDTO = _mapper.Map<FoodDetailDTO>(foodDetail);
+                var foodDetailDTO = _mapper.Map<FoodDetailDTO>(food);
                 return foodDetailDTO;
 
             } catch (Exception exception) when (exception is not NotFoundException)
@@ -80,7 +80,7 @@ namespace HomeCook.Api.Services
                 // Use model to create food object in DB
                 var newFood = await _foodRepository.AddFoodAsync(foodModel, foodImageUrls);
 
-                //Map model to DTO
+                //Map model to FoodDTO
                 var foodDto = _mapper.Map<FoodDTO>(newFood);
 
                 return foodDto;
@@ -92,19 +92,20 @@ namespace HomeCook.Api.Services
             }
         }
      
-        public async Task<FoodDTO> UpdateFoodAsync(Guid foodId, AddUpdateFoodDTO updateFood)
+        public async Task<FoodDTO> UpdateFoodAsync(Guid foodId, AddUpdateFoodDTO foodUpdate)
         {
             try
             {
                 var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
    
                 // Convert AddUpdateCategoryDTO to model
-                var foodModal = _mapper.Map<Food>(updateFood);
+                var foodModal = _mapper.Map<Food>(foodUpdate);
                 var updatedFood = await _foodRepository.UpdateFoodAsync(foodId, loggedInUserId, foodModal) ?? throw new NotFoundException("Food not found.");
 
                 // Convert Food model to FoodDTO
-                var updateFoodDto = _mapper.Map<FoodDTO>(updateFood);
-                return updateFoodDto;
+                var updatedFoodDto = _mapper.Map<FoodDTO>(updatedFood);
+
+                return updatedFoodDto;
             }
             catch (DbUpdateException exception)
             {
