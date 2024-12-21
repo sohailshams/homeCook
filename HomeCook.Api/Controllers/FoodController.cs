@@ -48,8 +48,8 @@ namespace HomeCook.Api.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateFood([FromRoute] Guid foodId, [FromBody] AddUpdateFoodDTO updateFood)
         {
-            var foodUpdate = await _foodService.UpdateFoodAsync(foodId, updateFood);
-            return Ok(updateFood);
+            var food = await _foodService.UpdateFoodAsync(foodId, updateFood);
+            return Ok(food);
         }
 
         [HttpDelete]
