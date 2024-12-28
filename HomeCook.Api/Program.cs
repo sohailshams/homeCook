@@ -8,6 +8,7 @@ using HomeCook.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +44,29 @@ options.UseNpgsql(connectionString));
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
+    options.Cookie.SameSite = SameSiteMode.Strict;
+    options.LoginPath = "/api/login"; // Redirect if not authenticated
+    options.ExpireTimeSpan = TimeSpan.FromDays(14); // Set token expiration
+    options.SlidingExpiration = true; // Renew token before it expires
+});
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") 
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+
 builder.Services.AddScoped <ICategoryReposity, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
@@ -52,6 +76,7 @@ builder.Services.AddScoped<IUserRepository,  UserRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -63,9 +88,13 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.MapGroup("api").MapIdentityApi<User>();
+app.UseCors("AllowAllOrigin");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.MapGroup("api").MapIdentityApi<User>();
 
 app.MapControllers();
 
