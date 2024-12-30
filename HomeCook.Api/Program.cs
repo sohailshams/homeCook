@@ -44,14 +44,17 @@ options.UseNpgsql(connectionString));
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddEntityFrameworkStores<AppDbContext>();
 
+// TODO - Remember to SameSiteMode.None to SameSiteMode.Strict when deploying
+
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; 
-    options.Cookie.SameSite = SameSiteMode.Strict;
-    options.LoginPath = "/api/login"; // Redirect if not authenticated
-    options.ExpireTimeSpan = TimeSpan.FromDays(14); // Set token expiration
-    options.SlidingExpiration = true; // Renew token before it expires
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.LoginPath = "/api/login"; 
+    options.ExpireTimeSpan = TimeSpan.FromHours(24); 
+    options.SlidingExpiration = true; 
+    options.Cookie.Expiration = null;
 });
 
 
