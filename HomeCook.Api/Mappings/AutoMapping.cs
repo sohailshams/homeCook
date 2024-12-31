@@ -21,6 +21,7 @@ namespace HomeCook.Api.Mappings
                 .ForMember(dest => dest.FoodImageUrls, opt => opt.MapFrom(src => src.FoodImage != null
                 ? src.FoodImage.Select(img => img.Image).ToList()
                 : new List<string>()));
+            CreateMap<User, UserInfoDTO>().ReverseMap();
         }
     }
 }
