@@ -18,7 +18,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodListAsync()
         {
-            var food = await dbContext.Foods.Include("Category").Include("FoodImage").ToListAsync();
+            var food = await dbContext.Foods.Include("Category").Include("FoodImage").Where(f => f.AvailableDate > DateTime.UtcNow).ToListAsync();
             return food;
         }
 
@@ -32,6 +32,8 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<Food> AddFoodAsync(Food food, List<string>? foodImageUrls = null)
         {
+
+            food.AvailableDate = DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             await dbContext.Foods.AddAsync(food);
             await dbContext.SaveChangesAsync();
 
