@@ -4,6 +4,7 @@ using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
@@ -18,7 +19,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodListAsync()
         {
-            var food = await dbContext.Foods.Include("Category").Include("FoodImage").Where(f => f.AvailableDate > DateTime.UtcNow).ToListAsync();
+            var food = await dbContext.Foods.Include("Category").Include("FoodImage").Where(f => f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
             return food;
         }
 
