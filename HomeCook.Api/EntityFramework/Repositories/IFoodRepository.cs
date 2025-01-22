@@ -7,6 +7,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
     {
         Task<List<Food>> GetFoodListAsync();
         Task<Food?> GetFoodDetailAsync(Guid foodId);
+        Task<List<Food>> GetFoodByCategoryIdAsync(Guid categoryId);
         Task<Food> AddFoodAsync(Food food, List<string>? foodImageUrls);
         Task<Food?> DeleteFoodByIdAsync(Guid foodId, string loggedInUserId);
         Task<Food?> UpdateFoodAsync(Guid foodId, string loggedInUserId, Food updateFood);

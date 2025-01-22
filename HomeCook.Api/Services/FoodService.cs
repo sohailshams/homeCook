@@ -55,6 +55,21 @@ namespace HomeCook.Api.Services
             }
         }
 
+
+        public async Task<List<FoodDTO>> GetFoodByCategoryIdAsync(Guid categoryId)
+        {
+            // get food list from db
+            var food = await _foodRepository.GetFoodByCategoryIdAsync(categoryId);
+
+            // map food list<Food> to food list<FoodDTO>
+            if (food.Count > 0)
+            {
+            var foodDto = _mapper.Map<List<FoodDTO>>(food);
+            return foodDto;
+            }
+            return [];
+        }
+
         public async Task<FoodDTO> AddFoodAsync(AddUpdateFoodDTO addFoodDTO)
         {
             try

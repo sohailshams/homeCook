@@ -31,6 +31,12 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return foodDetail;
         }
 
+        public async Task<List<Food>> GetFoodByCategoryIdAsync(Guid categoryId)
+        {
+            var food = await dbContext.Foods.Include("Category").Include("FoodImage").Where(f => f.CategoryId == categoryId && f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
+            return food;
+        }
+
         public async Task<Food> AddFoodAsync(Food food, List<string>? foodImageUrls = null)
         {
 
