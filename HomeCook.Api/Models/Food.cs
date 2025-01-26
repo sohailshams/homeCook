@@ -7,7 +7,7 @@
         public required string Name { get; set; }
         public decimal Price { get; set; }
         public required string Description { get; set; }
-        public required string Ingredients { get; set; }
+        public required string[] Ingredients { get; set; }
         public int QuantityAvailable { get; set; }
         public required string SellerId { get; set; } 
         public required User Seller { get; set; }
