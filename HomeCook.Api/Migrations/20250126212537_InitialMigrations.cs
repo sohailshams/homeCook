@@ -224,10 +224,9 @@ namespace HomeCook.Api.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Ingredients = table.Column<string>(type: "text", nullable: false),
+                    Ingredients = table.Column<string[]>(type: "text[]", nullable: false),
                     QuantityAvailable = table.Column<int>(type: "integer", nullable: false),
                     SellerId = table.Column<string>(type: "text", nullable: false),
-                    FoodImageId = table.Column<Guid>(type: "uuid", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>

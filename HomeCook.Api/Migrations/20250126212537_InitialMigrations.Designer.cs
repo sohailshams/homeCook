@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HomeCook.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241216224744_InitialMigrations")]
+    [Migration("20250126212537_InitialMigrations")]
     partial class InitialMigrations
     {
         /// <inheritdoc />
@@ -56,12 +56,9 @@ namespace HomeCook.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("FoodImageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Ingredients")
+                    b.Property<string[]>("Ingredients")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<string>("Name")
                         .IsRequired()

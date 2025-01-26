@@ -53,12 +53,9 @@ namespace HomeCook.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("FoodImageId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Ingredients")
+                    b.Property<string[]>("Ingredients")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text[]");
 
                     b.Property<string>("Name")
                         .IsRequired()
