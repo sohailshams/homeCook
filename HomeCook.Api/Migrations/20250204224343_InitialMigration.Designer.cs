@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HomeCook.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250126212537_InitialMigrations")]
-    partial class InitialMigrations
+    [Migration("20250204224343_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -171,6 +171,14 @@ namespace HomeCook.Api.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text");
 
