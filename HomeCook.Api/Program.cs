@@ -76,6 +76,8 @@ builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<IUserRepository,  UserRepository>();
 builder.Services.AddScoped<IUserService,  UserService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
