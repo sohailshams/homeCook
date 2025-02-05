@@ -1,4 +1,5 @@
-﻿using HomeCook.Api.Services;
+﻿using HomeCook.Api.DTOs;
+using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace HomeCook.Api.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         [Route("{userId}")]
         public async Task<IActionResult> GetUserProfile([FromRoute] string userId)
         {
@@ -27,5 +28,12 @@ namespace HomeCook.Api.Controllers
             return Ok(userProfile);
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddUserPforile([FromBody] AddUpdateProfileDTO addUserProfile)
+        {
+            var newUserProfile = await _userProfileService.AddUserProfileAsync(addUserProfile);
+            return Ok(newUserProfile);
+        }
     }
 }
