@@ -15,6 +15,5 @@ namespace HomeCook.Api.DTOs
         public string? Bio { get; set; }
         public string? ProfileImage { get; set; }
         public required string UserId { get; set; }
-        public required User User { get; set; }
     }
 }
