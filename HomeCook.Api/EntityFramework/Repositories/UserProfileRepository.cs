@@ -12,11 +12,18 @@ namespace HomeCook.Api.EntityFramework.Repositories
         {
             _dbContext = dbContext;
         }
+
         public async Task<Profile?> GetUserProfileByIdAsync(string userId)
         {
             var userProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
             return userProfile;
+        }
+        public async Task<Profile> AddUserProfileAsync(Profile profile)
+        {
+             await _dbContext.Profiles.AddAsync(profile);
+            await _dbContext.SaveChangesAsync();
+            return profile;
         }
     }
 }
