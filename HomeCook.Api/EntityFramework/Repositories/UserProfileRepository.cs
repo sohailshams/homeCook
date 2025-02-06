@@ -21,7 +21,10 @@ namespace HomeCook.Api.EntityFramework.Repositories
         }
         public async Task<Profile> AddUserProfileAsync(Profile profile)
         {
-             await _dbContext.Profiles.AddAsync(profile);
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId) ?? throw new Exception($"User with ID {profile.UserId} not found.");
+            user.IsProfileComplete = true;
+            user.Profile = profile;
+            await _dbContext.Profiles.AddAsync(profile);
             await _dbContext.SaveChangesAsync();
             return profile;
         }
