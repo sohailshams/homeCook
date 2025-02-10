@@ -179,9 +179,8 @@ namespace HomeCook.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("PhoneNumber")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PostCode")
                         .IsRequired()

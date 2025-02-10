@@ -198,7 +198,7 @@ namespace HomeCook.Api.Migrations
                     FirstName = table.Column<string>(type: "text", nullable: false),
                     LastName = table.Column<string>(type: "text", nullable: false),
                     Address = table.Column<string>(type: "text", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    PhoneNumber = table.Column<int>(type: "integer", nullable: false),
                     City = table.Column<string>(type: "text", nullable: false),
                     Country = table.Column<string>(type: "text", nullable: false),
                     PostCode = table.Column<string>(type: "text", nullable: false),

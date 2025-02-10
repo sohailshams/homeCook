@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HomeCook.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250204224343_InitialMigration")]
+    [Migration("20250210175408_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -182,9 +182,8 @@ namespace HomeCook.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("PhoneNumber")
+                        .HasColumnType("integer");
 
                     b.Property<string>("PostCode")
                         .IsRequired()
