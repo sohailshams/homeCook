@@ -6,5 +6,6 @@ namespace HomeCook.Api.EntityFramework.Repositories
     {
         Task<Profile?> GetUserProfileByIdAsync(string userId);
         Task<Profile> AddUserProfileAsync(Profile profile);
+        Task<Profile?> UpdateUserProfileAsync(string loggedInUserId, Profile updateProfile);
     }
 }
