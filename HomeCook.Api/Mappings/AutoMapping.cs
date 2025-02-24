@@ -24,6 +24,7 @@ namespace HomeCook.Api.Mappings
             CreateMap<User, UserInfoDTO>().ReverseMap();
             CreateMap<Profile, UserProfileDTO>().ReverseMap();
             CreateMap<AddUpdateProfileDTO, Profile>().ReverseMap();
+            CreateMap<Profile, AddUpdateProfileDTO>().ReverseMap();    
         }
     }
 }
