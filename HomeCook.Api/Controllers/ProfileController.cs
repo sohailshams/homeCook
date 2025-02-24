@@ -41,8 +41,8 @@ namespace HomeCook.Api.Controllers
         [Route("update-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] AddUpdateProfileDTO updateUserProfile)
         {
-            var userProfile = _userProfileService.updateUserProfileAsync(upateUserProfile);
-            return Ok(userProfile);
+           var userProfile = await _userProfileService.UpdateUserProfileAsync(updateUserProfile);
+           return Ok(userProfile);
         }
     }
 }
