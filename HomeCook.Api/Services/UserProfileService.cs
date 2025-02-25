@@ -6,6 +6,7 @@ using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Profile = HomeCook.Api.Models.Profile;
 
 namespace HomeCook.Api.Services
 {
@@ -61,7 +62,7 @@ namespace HomeCook.Api.Services
 
                 var newProfile = await _userProfileRepository.AddUserProfileAsync(profileModel);
 
-                // Map model to UserPforileDTO
+                // Map model to UserPforileDTO       
                 var userProfileDto = _mapper.Map<AddUpdateProfileDTO>(newProfile);
 
                 return userProfileDto;
@@ -69,6 +70,26 @@ namespace HomeCook.Api.Services
             catch (DbUpdateException exception)
             {
                 throw new DatabaseOperationException("Failed to add profile information in database.", exception);
+            }
+        }
+
+        public async Task<UserProfileDTO?> UpdateUserProfileAsync(AddUpdateProfileDTO updateProfile)
+        {
+            try
+            {
+                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+               
+                // Convert AddUpdateProfileDTO to model
+                var profileModal = _mapper.Map<Profile>(updateProfile);
+                var updatedProfile = await _userProfileRepository.UpdateUserProfileAsync(loggedInUserId, profileModal) ?? throw new NotFoundException("Profile informaton not found.");
+
+                // Convert Profile model to UserProfileDTO
+                var updatedProfileDto = _mapper.Map<UserProfileDTO>(updatedProfile);
+
+                return updatedProfileDto;
+            } catch (DbUpdateException exception)
+            {
+                throw new DatabaseOperationException("Failed to update profile information.", exception);
             }
         }
     }
