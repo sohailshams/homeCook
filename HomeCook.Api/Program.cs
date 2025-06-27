@@ -37,7 +37,7 @@ builder.Services.AddSwaggerGen(c =>
          }
     });
 });
-
+  
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
