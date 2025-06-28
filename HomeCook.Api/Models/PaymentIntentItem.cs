@@ -1,7 +1,8 @@
 ﻿namespace HomeCook.Api.Models
 {
-    public class PaymentIntentItem
+    public class PaymentIntentItemData
     {
         public long  Amount { get; set; }
+        public int Quantity { get; set; }
     }
 }
