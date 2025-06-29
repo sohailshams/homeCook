@@ -13,13 +13,13 @@ namespace HomeCook.Api.Controllers
     public class CreatePaymentIntent : ControllerBase
     {
         [HttpPost]
-        public async Task<ActionResult> PaymentIntent([FromBody] PaymentIntentItemData paymentAmount)
+        public async Task<ActionResult> PaymentIntent([FromBody] PaymentIntentItemData itemData)
         {
             try
             {
                 var options = new PaymentIntentCreateOptions
                 {
-                    Amount = paymentAmount.Amount * 100,
+                    Amount = itemData.Amount * 100,
                     Currency = "gbp",
                     AutomaticPaymentMethods = new()
                     {
@@ -27,7 +27,8 @@ namespace HomeCook.Api.Controllers
                     },
                     Metadata = new Dictionary<string, string>
                         {
-                            { "quantity", paymentAmount.Quantity.ToString() },
+                            { "quantity", itemData.Quantity.ToString() },
+                            { "foodId", itemData.FoodId.ToString() }
                         }
                 };
 

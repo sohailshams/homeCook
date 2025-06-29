@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using HomeCook.Api.Services;
+using Microsoft.AspNetCore.Mvc;
 using Stripe;
 
 namespace HomeCook.Api.Controllers
@@ -8,10 +9,12 @@ namespace HomeCook.Api.Controllers
     public class StripeWebHook : ControllerBase
     {
         private readonly IConfiguration _conf;
+        private readonly IUpdateQuantityService _updateQuantity;
 
-        public StripeWebHook(IConfiguration conf)
+        public StripeWebHook(IConfiguration conf, IUpdateQuantityService updateQuantity)
         {
             _conf = conf;
+            _updateQuantity = updateQuantity;
         }
 
         [HttpPost]
@@ -31,7 +34,18 @@ namespace HomeCook.Api.Controllers
                 if (paymentIntent != null) 
                 { 
                     var purchasedItemQuantity = paymentIntent.Metadata["quantity"]; 
-                    // TODO: Parse metadata and update your item quantity here
+                    var foodId = paymentIntent.Metadata["foodId"];
+                    if (Guid.TryParse(foodId, out Guid parsedFoodId) && int.TryParse(purchasedItemQuantity, out int parsedQuantity))
+                    {
+                        // Use itemId as Guid here
+                        await _updateQuantity.UpdateQuantityAsync(parsedFoodId, parsedQuantity);
+                    }
+                    else
+                    {
+                        // If quantiy does not update then send an email to the admin
+                        // Update below BadRequest message with actual email sending logic
+                        return BadRequest("Invalid foodId or food quantity");
+                    }                   
                 }
 
             }
