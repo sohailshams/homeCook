@@ -80,6 +80,8 @@ builder.Services.AddScoped<IUserRepository,  UserRepository>();
 builder.Services.AddScoped<IUserService,  UserService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IUpdateQuantityRepository, UpdateQuantityRepository>();
+builder.Services.AddScoped<IUpdateQuantityService, UpdateQuantityService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
