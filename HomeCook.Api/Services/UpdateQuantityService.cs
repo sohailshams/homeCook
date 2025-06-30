@@ -1,17 +1,21 @@
 ﻿
 using HomeCook.Api.DTOs;
+using HomeCook.Api.EntityFramework.Repositories;
 
 namespace HomeCook.Api.Services
 {
     public class UpdateQuantityService : IUpdateQuantityService
     {
-        public UpdateQuantityService()
+        private readonly IUpdateQuantityRepository _updateQuantityRepository;
+
+        public UpdateQuantityService(IUpdateQuantityRepository updateQuantityRepository)
         {
+            _updateQuantityRepository = updateQuantityRepository;
         }
 
-        public Task<UpdateItemDTO> UpdateQuantityAsync(Guid foodId, int quantity)
+        public async Task<UpdateItemDTO> UpdateQuantityAsync(Guid foodId, int quantity)
         {
-            throw new NotImplementedException();
+            return await _updateQuantityRepository.UpdateQuantityAsync(foodId, quantity);
         }
     }
 }
