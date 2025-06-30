@@ -31,13 +31,12 @@ namespace HomeCook.Api.Controllers
             if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded)
             {
                 var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-                if (paymentIntent != null) 
-                { 
-                    var purchasedItemQuantity = paymentIntent.Metadata["quantity"]; 
+                if (paymentIntent != null)
+                {
+                    var purchasedItemQuantity = paymentIntent.Metadata["quantity"];
                     var foodId = paymentIntent.Metadata["foodId"];
                     if (Guid.TryParse(foodId, out Guid parsedFoodId) && int.TryParse(purchasedItemQuantity, out int parsedQuantity))
                     {
-                        // Use itemId as Guid here
                         await _updateQuantity.UpdateQuantityAsync(parsedFoodId, parsedQuantity);
                     }
                     else
@@ -45,7 +44,7 @@ namespace HomeCook.Api.Controllers
                         // If quantiy does not update then send an email to the admin
                         // Update below BadRequest message with actual email sending logic
                         return BadRequest("Invalid foodId or food quantity");
-                    }                   
+                    }
                 }
 
             }
