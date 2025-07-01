@@ -37,15 +37,17 @@ namespace HomeCook.Api.Controllers
                     var foodId = paymentIntent.Metadata["foodId"];
                     if (Guid.TryParse(foodId, out Guid parsedFoodId) && int.TryParse(purchasedItemQuantity, out int parsedQuantity))
                     {
-                        await _updateQuantity.UpdateQuantityAsync(parsedFoodId, parsedQuantity);
+                        var result = await _updateQuantity.UpdateQuantityAsync(parsedFoodId, parsedQuantity);
+                        if (!result)
+                        {
+                            //Implement email sending logic here to notify admin about the failure
+                        }
+
                     }
                     else
                     {
-                        // If quantiy does not update then send an email to the admin
-                        // Update below BadRequest message with actual email sending logic
-                        return BadRequest("Invalid foodId or food quantity");
+                        // If quantiy does not update then send an email to the admin                    }
                     }
-                }
 
             }
 
