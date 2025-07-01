@@ -51,8 +51,8 @@ namespace HomeCook.Api.Controllers
 
                 }
 
-                return Ok();
             }
+                return Ok();
         }
     }
 }
