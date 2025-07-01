@@ -13,9 +13,23 @@ namespace HomeCook.Api.Services
             _updateQuantityRepository = updateQuantityRepository;
         }
 
-        public async Task<UpdateItemDTO> UpdateQuantityAsync(Guid foodId, int quantity)
+        public async Task<bool> UpdateQuantityAsync(Guid foodId, int quantity)
         {
-            return await _updateQuantityRepository.UpdateQuantityAsync(foodId, quantity);
+            try
+            {
+                var result = await _updateQuantityRepository.UpdateQuantityAsync(foodId, quantity);
+                if (result == null)
+                {
+                    return false;
+                }
+
+                return true;
+
+            }
+            catch (Exception exception)
+            {
+                return false;
+            }
         }
     }
 }
