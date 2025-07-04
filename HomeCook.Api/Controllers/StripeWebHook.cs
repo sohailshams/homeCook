@@ -10,11 +10,13 @@ namespace HomeCook.Api.Controllers
     {
         private readonly IConfiguration _conf;
         private readonly IUpdateQuantityService _updateQuantity;
+        private readonly IEmailService _mailService;
 
-        public StripeWebHook(IConfiguration conf, IUpdateQuantityService updateQuantity)
+        public StripeWebHook(IConfiguration conf, IUpdateQuantityService updateQuantity, IEmailService mailService)
         {
             _conf = conf;
             _updateQuantity = updateQuantity;
+            _mailService = mailService;
         }
 
         [HttpPost]
@@ -40,19 +42,18 @@ namespace HomeCook.Api.Controllers
                         var result = await _updateQuantity.UpdateQuantityAsync(parsedFoodId, parsedQuantity);
                         if (!result)
                         {
-                            //Implement email sending logic here to notify admin about the failure
+                            await _mailService.SendEmailAsync(Constants.Constants.EmailFrom, Constants.Constants.EmailTo, Constants.Constants.EmailSubject, Constants.Constants.PlainTextContent, Constants.Constants.HtmlContentBody);
                         }
 
                     }
                     else
                     {
-                        // If quantiy does not update then send an email to the admin                    }
+                        await _mailService.SendEmailAsync(Constants.Constants.EmailFrom, Constants.Constants.EmailTo, Constants.Constants.EmailSubject, Constants.Constants.PlainTextContent, Constants.Constants.HtmlContentBody);
                     }
-
                 }
 
             }
-                return Ok();
+                return Ok(); 
         }
     }
 }
