@@ -82,6 +82,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IUpdateQuantityRepository, UpdateQuantityRepository>();
 builder.Services.AddScoped<IUpdateQuantityService, UpdateQuantityService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
