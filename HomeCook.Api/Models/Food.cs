@@ -1,4 +1,6 @@
-﻿namespace HomeCook.Api.Models
+﻿using NpgsqlTypes;
+
+namespace HomeCook.Api.Models
 {
     public class Food
     {
@@ -9,10 +11,14 @@
         public required string Description { get; set; }
         public required string[] Ingredients { get; set; }
         public int QuantityAvailable { get; set; }
-        public required string SellerId { get; set; } 
+        public required string SellerId { get; set; }
         public required User Seller { get; set; }
         public List<FoodImage>? FoodImage { get; set; }
         public Guid CategoryId { get; set; }
         public required Category Category { get; set; }
+
+        // Added for full-text search
+        public NpgsqlTsVector SearchVector { get; set; } = null!;
+
     }
 }
