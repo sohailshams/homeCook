@@ -32,12 +32,12 @@ builder.Services.AddSwaggerGen(c =>
         {
 
             Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearerAuth"}
-           
+
         }, []
          }
     });
 });
-  
+
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -53,9 +53,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.None;
-    options.LoginPath = "/api/login"; 
-    options.ExpireTimeSpan = TimeSpan.FromHours(24); 
-    options.SlidingExpiration = true; 
+    options.LoginPath = "/api/login";
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
     options.Cookie.Expiration = null;
 });
 
@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") 
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -72,17 +72,19 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.AddScoped <ICategoryReposity, CategoryRepository>();
+builder.Services.AddScoped<ICategoryReposity, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodService, FoodService>();
-builder.Services.AddScoped<IUserRepository,  UserRepository>();
-builder.Services.AddScoped<IUserService,  UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IUpdateQuantityRepository, UpdateQuantityRepository>();
 builder.Services.AddScoped<IUpdateQuantityService, UpdateQuantityService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFoodSearchService, FoodSearchService>();
+builder.Services.AddScoped<IFoodSearchRepository, FoodSearchRepositoy>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
