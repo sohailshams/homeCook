@@ -21,9 +21,10 @@ public class FoodSearchRepositoy : IFoodSearchRepository
         // PostgreSQL Full Text Search with EF.Functions
         return await _dbContext.Foods
             .Include(f => f.Category)
+            .Include("FoodImage")
             .Where(f =>
                 f.SearchVector.Matches(
-                    EF.Functions.PlainToTsQuery("english", foodSearchTerm)) ||
+                    EF.Functions.ToTsQuery("english", $"{foodSearchTerm}:*")) ||
                     EF.Functions.ILike(f.Category.Name, $"%{foodSearchTerm}%"))
                 .OrderByDescending(f => f.AvailableDate)
                 .ToListAsync();
