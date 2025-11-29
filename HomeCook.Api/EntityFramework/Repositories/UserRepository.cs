@@ -11,9 +11,9 @@ public class UserRepository : IUserRepository
     {
         this.dbContext = dbContext;
     }
-    public async Task<User?> GetUserByIdAsync(string userId)
+    public async Task<User?> GetUserByIdAsync(Guid userId)
     {
-          var user = await dbContext.Users.FindAsync(userId);
-            return user;
+        var user = await dbContext.Users.FindAsync(userId);
+        return user;
     }
 }

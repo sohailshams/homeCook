@@ -21,7 +21,7 @@ namespace HomeCook.Api.Controllers
         [HttpGet]
         [Authorize]
         [Route("{userId}")]
-        public async Task<IActionResult> GetUserProfile([FromRoute] string userId)
+        public async Task<IActionResult> GetUserProfile([FromRoute] Guid userId)
         {
             var userProfile = await _userProfileService.GetUserProfileAsync(userId);
 
@@ -41,8 +41,8 @@ namespace HomeCook.Api.Controllers
         [Route("update-profile")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] AddUpdateProfileDTO updateUserProfile)
         {
-           var userProfile = await _userProfileService.UpdateUserProfileAsync(updateUserProfile);
-           return Ok(userProfile);
+            var userProfile = await _userProfileService.UpdateUserProfileAsync(updateUserProfile);
+            return Ok(userProfile);
         }
     }
 }

@@ -25,18 +25,18 @@ namespace HomeCook.Api.Services
             _userRepository = userRepository;
         }
 
-        public async Task<UserProfileDTO?> GetUserProfileAsync(string userId)
+        public async Task<UserProfileDTO?> GetUserProfileAsync(Guid userId)
         {
             try
             {
                 var userProfileModel = await _userProfileRepository.GetUserProfileByIdAsync(userId);
-               if (userProfileModel == null)
+                if (userProfileModel == null)
                 {
                     throw new NotFoundException($"Profile with ID {userId} was not found.");
                 }
                 var userProfileDTO = _mapper.Map<UserProfileDTO>(userProfileModel);
                 return userProfileDTO;
-                 
+
             }
             catch (Exception exception) when (exception is not NotFoundException)
             {
@@ -46,8 +46,8 @@ namespace HomeCook.Api.Services
 
         public async Task<AddUpdateProfileDTO> AddUserProfileAsync(AddUpdateProfileDTO addUpdateProfileDTO)
         {
-            try 
-            { 
+            try
+            {
                 var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
 
                 if (loggedInUserId != addUpdateProfileDTO.UserId)
@@ -78,7 +78,7 @@ namespace HomeCook.Api.Services
             try
             {
                 var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-               
+
                 // Convert AddUpdateProfileDTO to model
                 var profileModal = _mapper.Map<Profile>(updateProfile);
                 var updatedProfile = await _userProfileRepository.UpdateUserProfileAsync(loggedInUserId, profileModal) ?? throw new NotFoundException("Profile informaton not found.");
@@ -87,7 +87,8 @@ namespace HomeCook.Api.Services
                 var updatedProfileDto = _mapper.Map<UserProfileDTO>(updatedProfile);
 
                 return updatedProfileDto;
-            } catch (DbUpdateException exception)
+            }
+            catch (DbUpdateException exception)
             {
                 throw new DatabaseOperationException("Failed to update profile information.", exception);
             }

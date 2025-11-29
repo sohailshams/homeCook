@@ -1,10 +1,5 @@
-﻿using HomeCook.Api.DTOs;
-using HomeCook.Api.Exceptions;
-using HomeCook.Api.Models;
+﻿using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
@@ -27,7 +22,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
         public async Task<Food?> GetFoodDetailAsync(Guid foodId)
         {
             var foodDetail = await dbContext.Foods.Include("Category").Include("FoodImage").FirstOrDefaultAsync(f => f.Id == foodId);
-            
+
             return foodDetail;
         }
 
@@ -48,24 +43,24 @@ namespace HomeCook.Api.EntityFramework.Repositories
             {
                 var foodImages = foodImageUrls.Select(url => new FoodImage
                 {
-                    FoodId = food.Id, 
+                    FoodId = food.Id,
                     Food = food,
                     Image = url
                 }).ToList();
 
                 await dbContext.FoodImages.AddRangeAsync(foodImages);
-                await dbContext.SaveChangesAsync(); 
+                await dbContext.SaveChangesAsync();
             }
 
             return food;
         }
 
         public async Task<Food?> UpdateFoodAsync(Guid foodId, string loggedInUserId, Food updateFood)
-        {           
+        {
             var existingFood = await GetFoodDetailAsync(foodId);
             if (existingFood == null) return null;
 
-            if (existingFood.SellerId != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
+            if (existingFood.SellerId.ToString() != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
             existingFood.Name = updateFood.Name;
             existingFood.Description = updateFood.Description;
             existingFood.AvailableDate = updateFood.AvailableDate;
@@ -81,12 +76,12 @@ namespace HomeCook.Api.EntityFramework.Repositories
                 // Add new images
                 var newImages = updateFood.FoodImage.Select(img => new FoodImage
                 {
-                    FoodId = existingFood.Id, 
-                    Image = img.Image, 
+                    FoodId = existingFood.Id,
+                    Image = img.Image,
                     Food = existingFood
                 }).ToList();
 
-                await dbContext.FoodImages.AddRangeAsync(newImages); 
+                await dbContext.FoodImages.AddRangeAsync(newImages);
             }
 
 
@@ -99,7 +94,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
             var existingFood = await GetFoodDetailAsync(foodId);
             if (existingFood == null) return null;
 
-            if (existingFood.SellerId != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to delete this food item."); }
+            if (existingFood.SellerId.ToString() != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to delete this food item."); }
 
             dbContext.Remove(existingFood);
             await dbContext.SaveChangesAsync();
