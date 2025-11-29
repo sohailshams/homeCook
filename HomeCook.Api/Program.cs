@@ -6,9 +6,7 @@ using HomeCook.Api.Mappings;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +42,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseNpgsql(connectionString));
 
 builder.Services.AddIdentityApiEndpoints<User>()
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>();
 
 // TODO - Remember to SameSiteMode.None to SameSiteMode.Strict when deploying
@@ -89,7 +88,6 @@ builder.Services.AddScoped<IFoodSearchRepository, FoodSearchRepositoy>();
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
