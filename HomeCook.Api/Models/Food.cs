@@ -16,6 +16,7 @@ namespace HomeCook.Api.Models
         public List<FoodImage>? FoodImage { get; set; }
         public required Guid CategoryId { get; set; }
         public Category Category { get; set; } = null!;
+        public required string PostCode { get; set; }
 
         // Added for full-text search
         public NpgsqlTsVector SearchVector { get; set; } = null!;
