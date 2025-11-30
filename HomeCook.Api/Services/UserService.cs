@@ -14,7 +14,7 @@ namespace HomeCook.Api.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
 
-        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository )
+        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository)
         {
             _mapper = mapper;
             _userRepository = userRepository;
@@ -24,11 +24,11 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-
+                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+                var loggedInUserId = Guid.Parse(loggedInUserIdString);
                 var user = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException("User not found.");
 
-                //Map user model to UserInfoDTO
+                // Map user model to UserInfoDTO
                 var userInfoDto = _mapper.Map<UserInfoDTO>(user);
 
                 return userInfoDto;
