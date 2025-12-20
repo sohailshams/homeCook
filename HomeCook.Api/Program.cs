@@ -8,6 +8,7 @@ using HomeCook.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Stripe;
+using CloudinaryDotNet;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -70,6 +71,13 @@ builder.Services.AddCors(options =>
     });
 });
 
+var cloudinaryUrl = builder.Configuration["CLOUDINARY_URL"];
+if (string.IsNullOrWhiteSpace(cloudinaryUrl))
+    throw new Exception("CLOUDINARY_URL is not set");
+
+var cloudinary = new Cloudinary(cloudinaryUrl);
+cloudinary.Api.Secure = true;
+builder.Services.AddSingleton(cloudinary);
 
 builder.Services.AddScoped<ICategoryReposity, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
