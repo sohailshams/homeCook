@@ -13,7 +13,7 @@ namespace HomeCook.Api.Models
         public int QuantityAvailable { get; set; }
         public required Guid SellerId { get; set; }
         public User Seller { get; set; } = null!;
-        public List<FoodImage>? FoodImage { get; set; }
+        public List<FoodImage> FoodImages { get; set; }
         public required Guid CategoryId { get; set; }
         public Category Category { get; set; } = null!;
         public required string PostCode { get; set; }
