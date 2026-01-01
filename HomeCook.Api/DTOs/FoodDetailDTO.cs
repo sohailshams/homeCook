@@ -11,8 +11,10 @@ namespace HomeCook.Api.DTOs
         public DateTime AvailableDate { get; set; }
         public int QuantityAvailable { get; set; }
         public required List<string> Ingredients { get; set; }
-        public required string SellerId { get; set; }
-        public List<string>? FoodImageUrls { get; set; }
+        public required Guid SellerId { get; set; }
+        public List<FoodImage> FoodImages { get; set; }
         public required Category Category { get; set; }
+        public required Guid CategoryId { get; set; }
+        public required string PostCode { get; set; }
     }
 }
