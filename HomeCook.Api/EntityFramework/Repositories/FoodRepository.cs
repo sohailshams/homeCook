@@ -14,79 +14,37 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodListAsync()
         {
-            var food = await dbContext.Foods.Include("Category").Include("FoodImage").Where(f => f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
+            var food = await dbContext.Foods.Include("Category").Include("FoodImages").Where(f => f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
             return food;
         }
 
-
         public async Task<Food?> GetFoodDetailAsync(Guid foodId)
         {
-            var foodDetail = await dbContext.Foods.Include("Category").Include("FoodImage").FirstOrDefaultAsync(f => f.Id == foodId);
+            var foodDetail = await dbContext.Foods.Include("Category").Include("FoodImages").FirstOrDefaultAsync(f => f.Id == foodId);
 
             return foodDetail;
         }
 
         public async Task<List<Food>> GetFoodByCategoryIdAsync(Guid categoryId)
         {
-            var food = await dbContext.Foods.Include("Category").Include("FoodImage").Where(f => f.CategoryId == categoryId && f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
+            var food = await dbContext.Foods.Include("Category").Include("FoodImages").Where(f => f.CategoryId == categoryId && f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
             return food;
         }
 
-        public async Task<Food> AddFoodAsync(Food food, List<string>? foodImageUrls = null)
+        public async Task<Food> AddFoodAsync(Food food)
         {
 
             food.AvailableDate = DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             await dbContext.Foods.AddAsync(food);
             await dbContext.SaveChangesAsync();
-
-            if (foodImageUrls != null && foodImageUrls.Count > 0)
-            {
-                var foodImages = foodImageUrls.Select(url => new FoodImage
-                {
-                    FoodId = food.Id,
-                    Food = food,
-                    Image = url
-                }).ToList();
-
-                await dbContext.FoodImages.AddRangeAsync(foodImages);
-                await dbContext.SaveChangesAsync();
-            }
-
             return food;
         }
 
-        public async Task<Food?> UpdateFoodAsync(Guid foodId, string loggedInUserId, Food updateFood)
+        public async Task<Food?> UpdateFoodAsync(Food updateFood)
         {
-            var existingFood = await GetFoodDetailAsync(foodId);
-            if (existingFood == null) return null;
-
-            if (existingFood.SellerId.ToString() != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
-            existingFood.Name = updateFood.Name;
-            existingFood.Description = updateFood.Description;
-            existingFood.AvailableDate = updateFood.AvailableDate;
-            existingFood.QuantityAvailable = updateFood.QuantityAvailable;
-            existingFood.Price = updateFood.Price;
-            existingFood.CategoryId = updateFood.CategoryId;
-            existingFood.Ingredients = updateFood.Ingredients;
-            existingFood.SellerId = updateFood.SellerId;
-            if (updateFood.FoodImage != null && updateFood.FoodImage.Count > 0)
-            {
-                // Remove existing images
-                dbContext.FoodImages.RemoveRange(existingFood.FoodImage ?? []);
-                // Add new images
-                var newImages = updateFood.FoodImage.Select(img => new FoodImage
-                {
-                    FoodId = existingFood.Id,
-                    Image = img.Image,
-                    Food = existingFood
-                }).ToList();
-
-                await dbContext.FoodImages.AddRangeAsync(newImages);
-            }
-
-
+            dbContext.Update(updateFood);
             await dbContext.SaveChangesAsync();
-            return existingFood;
+            return updateFood;
         }
 
         public async Task<Food?> DeleteFoodByIdAsync(Guid foodId, string loggedInUserId)
