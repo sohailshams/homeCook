@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,6 +51,29 @@ namespace HomeCook.Api.Controllers
             {
                 _logger.LogError(exception, "Failed to generate Cloudinary signature.");
                 return StatusCode(500, new { errorMessage = "Failed to generate Cloudinary signature." });
+            }
+        }
+
+        [HttpDelete("{publicId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteCloudinaryImage(string publicId)
+        {
+            try
+            {
+                _logger.LogInformation($"Public Id = {publicId}");
+                if (string.IsNullOrWhiteSpace(publicId)) return BadRequest("Public Id is required.");
+                var deletionParams = new DeletionParams(publicId);
+                var result = await _cloudinary.DestroyAsync(deletionParams);
+
+                if (result.Result == "ok")
+                    return Ok();
+
+                return BadRequest(result.Error?.Message ?? "Failed to delete Cloudinary image");
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Failed to delete Cloudinary image.");
+                return StatusCode(500, new { errorMessage = "Failed to delete Cloudinary image." });
             }
         }
     }
