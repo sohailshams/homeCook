@@ -12,7 +12,7 @@ namespace HomeCook.Api.DTOs
         public required List<string> Ingredients { get; set; }
         public int QuantityAvailable { get; set; }
         public required Guid SellerId { get; set; }
-        public List<FoodImage> FoodImages { get; set; }
+        public List<FoodImageDTO> FoodImages { get; set; }
         public required Guid CategoryId { get; set; }
         public required string PostCode { get; set; }
 

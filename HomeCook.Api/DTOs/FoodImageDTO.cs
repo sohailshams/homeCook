@@ -2,7 +2,7 @@
 {
     public class FoodImageDTO
     {
-        public string FoodImageUrl { get; set; }
+        public string ImageUrl { get; set; }
         public string PublicId { get; set; }
     }
 }
