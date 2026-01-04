@@ -34,7 +34,6 @@ namespace HomeCook.Api.EntityFramework.Repositories
         public async Task<Food> AddFoodAsync(Food food)
         {
 
-            food.AvailableDate = DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
             await dbContext.Foods.AddAsync(food);
             await dbContext.SaveChangesAsync();
             return food;
