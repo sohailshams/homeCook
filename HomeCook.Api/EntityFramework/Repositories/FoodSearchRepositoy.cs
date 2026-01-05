@@ -21,7 +21,7 @@ public class FoodSearchRepositoy : IFoodSearchRepository
         // PostgreSQL Full Text Search with EF.Functions
         return await _dbContext.Foods
             .Include(f => f.Category)
-            .Include("FoodImage")
+            .Include("FoodImages")
             .Where(f =>
                 f.SearchVector.Matches(
                     EF.Functions.ToTsQuery("english", $"{foodSearchTerm}:*")) ||
