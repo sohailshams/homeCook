@@ -7,6 +7,6 @@ namespace HomeCook.Api.Models
     {
         public bool IsProfileComplete { get; set; } = false;
         public Profile? Profile { get; set; }
-
+        public List<Address> Addresses { get; set; } = new List<Address>();
     }
 }
