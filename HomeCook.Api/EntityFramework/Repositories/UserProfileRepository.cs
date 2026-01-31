@@ -38,10 +38,6 @@ namespace HomeCook.Api.EntityFramework.Repositories
             existingProfile.FirstName = updateProfile.FirstName;
             existingProfile.LastName = updateProfile.LastName;
             existingProfile.PhoneNumber = updateProfile.PhoneNumber;
-            existingProfile.Address = updateProfile.Address;
-            existingProfile.City = updateProfile.City;
-            existingProfile.PostCode = updateProfile.PostCode;
-            existingProfile.Country = updateProfile.Country;
             existingProfile.User = user;
             existingProfile.UserId = updateProfile.UserId;
             if (updateProfile.ProfileImage != null)
