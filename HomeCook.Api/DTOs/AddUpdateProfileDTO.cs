@@ -14,6 +14,6 @@ namespace HomeCook.Api.DTOs
         public string? ProfileImage { get; set; }
         public required Guid UserId { get; set; }
         public bool IsPrimary { get; set; }
-        public string Line1 { get; set; }
+        public string AddressLine1 { get; set; }
     }
 }

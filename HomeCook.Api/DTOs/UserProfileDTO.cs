@@ -4,10 +4,10 @@ namespace HomeCook.Api.DTOs
 {
     public class UserProfileDTO
     {
-        public Guid Id { get; set; }
+        public Guid ProfileId { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public required string Line1 { get; set; }
+        public required string AddressLine1 { get; set; }
         public required string PhoneNumber { get; set; }
         public required string City { get; set; }
         public required string Country { get; set; }

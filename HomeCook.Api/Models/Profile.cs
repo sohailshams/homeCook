@@ -2,7 +2,7 @@
 {
     public class Profile
     {
-        public Guid Id { get; set; }
+        public Guid ProfileId { get; set; }
         public required Guid UserId { get; set; }
         public User User { get; set; } = null!;
         public required string FirstName { get; set; }
