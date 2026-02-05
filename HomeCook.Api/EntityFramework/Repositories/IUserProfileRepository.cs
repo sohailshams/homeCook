@@ -1,11 +1,12 @@
 ﻿using HomeCook.Api.Models;
+using HomeCook.Api.Projections;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
     public interface IUserProfileRepository
     {
         Task<Profile?> GetUserProfileByIdAsync(Guid userId);
-        Task<Profile> AddUserProfileAsync(Profile profile);
+        Task<ProfileWithAddress> AddUserProfileAddressAsync(Profile profile, Address address);
         Task<Profile?> UpdateUserProfileAsync(string loggedInUserId, Profile updateProfile);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HomeCook.Api.DTOs;
 using HomeCook.Api.Models;
+using HomeCook.Api.Projections;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeCook.Api.EntityFramework.Repositories
@@ -18,15 +19,6 @@ namespace HomeCook.Api.EntityFramework.Repositories
             var userProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
 
             return userProfile;
-        }
-        public async Task<Profile> AddUserProfileAsync(Profile profile)
-        {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId) ?? throw new Exception($"User with ID {profile.UserId} not found.");
-            user.IsProfileComplete = true;
-            user.Profile = profile;
-            await _dbContext.Profiles.AddAsync(profile);
-            await _dbContext.SaveChangesAsync();
-            return profile;
         }
 
         public async Task<Profile?> UpdateUserProfileAsync(string loggedInUserId, Profile updateProfile)
@@ -51,6 +43,28 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
             await _dbContext.SaveChangesAsync();
             return existingProfile;
+        }
+
+        public async Task<ProfileWithAddress> AddUserProfileAddressAsync(Profile profile, Address address)
+        {
+
+            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId);
+            if (user == null)
+            {
+                throw new Exception($"User with ID {profile.UserId} not found.");
+            }
+            user.IsProfileComplete = true;
+
+            var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == profile.UserId);
+            if (existingProfile != null)
+            {
+                throw new Exception($"A profile with {profile.UserId} already exists.");
+            }
+
+            await _dbContext.Profiles.AddAsync(profile);
+            await _dbContext.Addresses.AddAsync(address);
+            await _dbContext.SaveChangesAsync();
+            return new ProfileWithAddress(profile, address);
         }
     }
 }
