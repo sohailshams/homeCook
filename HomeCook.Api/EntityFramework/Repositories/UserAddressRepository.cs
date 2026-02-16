@@ -21,6 +21,15 @@ namespace HomeCook.Api.EntityFramework.Repositories
         }
         public async Task<Address> AddUserAddressAsync(Address address)
         {
+            if (address.IsPrimary)
+            {
+                var existingAddress = await _dbContext.Addresses.FirstOrDefaultAsync(a => a.UserId == address.UserId && a.IsPrimary);
+                if (existingAddress != null)
+                {
+                    existingAddress.IsPrimary = false;
+                }
+            }
+
             await _dbContext.Addresses.AddAsync(address);
             await _dbContext.SaveChangesAsync();
             return address;
