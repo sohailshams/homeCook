@@ -93,6 +93,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFoodSearchService, FoodSearchService>();
 builder.Services.AddScoped<IFoodSearchRepository, FoodSearchRepositoy>();
 builder.Services.AddScoped<IUserAddressRepository, UserAddressRepository>();
+builder.Services.AddScoped<IUserAddressService, UserAddressService>();
 
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
