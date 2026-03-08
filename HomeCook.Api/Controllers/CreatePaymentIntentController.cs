@@ -1,16 +1,13 @@
 ﻿using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
-using Stripe.Checkout;
-using System;
 
 namespace HomeCook.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CreatePaymentIntent : ControllerBase
+    public class CreatePaymentIntentController : ControllerBase
     {
         [HttpPost]
         public async Task<ActionResult> PaymentIntent([FromBody] PaymentIntentItemData itemData)
