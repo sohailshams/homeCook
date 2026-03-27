@@ -29,7 +29,8 @@ namespace HomeCook.Api.Controllers
                 var parametersToSign = new SortedDictionary<string, object>
                 {
                     { "timestamp", timestamp },
-                    { "upload_preset", "homeCook" }
+                    { "upload_preset", "homeCook" },
+                    { "tags", "draft" }
                 };
 
                 var signature = _cloudinary.Api.SignParameters(parametersToSign);
