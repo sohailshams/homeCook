@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using HomeCook.Api.DTOs;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
@@ -19,8 +21,15 @@ namespace HomeCook.Api.Services
         public readonly IUserRepository _userRepository;
         private readonly ICategoryReposity _categoryReposity;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly Cloudinary _cloudinary;
 
-        public FoodService(IFoodRepository foodRepository, IMapper mapper, ICategoryService categoryService, IUserRepository userRepository, ICategoryReposity categoryReposity, IHttpContextAccessor httpContextAccessor)
+        public FoodService(IFoodRepository foodRepository,
+                            IMapper mapper,
+                            ICategoryService categoryService,
+                            IUserRepository userRepository,
+                            ICategoryReposity categoryReposity,
+                            IHttpContextAccessor httpContextAccessor,
+                            Cloudinary cloudinary)
         {
             _foodRepository = foodRepository;
             _mapper = mapper;
@@ -28,6 +37,7 @@ namespace HomeCook.Api.Services
             _userRepository = userRepository;
             _categoryReposity = categoryReposity;
             _httpContextAccessor = httpContextAccessor;
+            _cloudinary = cloudinary;
         }
 
         public async Task<List<FoodDTO>> GetFoodListAsync()
@@ -98,6 +108,10 @@ namespace HomeCook.Api.Services
 
                 // Use model to create food object in DB
                 var newFood = await _foodRepository.AddFoodAsync(foodModel);
+                var imagePublicIds = newFood.FoodImages.Select(x => x.PublicId).ToList();
+
+                // Update draft tag to food
+                await MarkTagAsFoodAsync(imagePublicIds);
 
                 //Map model to FoodDTO
                 var foodDto = _mapper.Map<FoodDTO>(newFood);
@@ -170,6 +184,23 @@ namespace HomeCook.Api.Services
             {
                 throw new DatabaseOperationException("Failed to delete food.", exception);
             }
+        }
+
+        private async Task MarkTagAsFoodAsync(List<string> publicIds)
+        {
+            if (publicIds.Count == 0)
+            {
+                throw new InvalidOperationException("publicId is required");
+            }
+
+            var tagParams = new TagParams()
+            {
+                PublicIds = publicIds,
+                Tag = "food",
+                Command = TagCommand.Replace
+            };
+
+            await _cloudinary.TagAsync(tagParams);
         }
     }
 }
