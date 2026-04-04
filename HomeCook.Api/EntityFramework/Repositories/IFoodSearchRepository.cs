@@ -6,4 +6,5 @@ namespace HomeCook.Api.EntityFramework.Repositories;
 public interface IFoodSearchRepository
 {
     Task<List<Food>> FoodSearchAsync(string foodSearchTerm);
+    Task<List<Food>> FoodSearchPostCodeAsync(string foodSearchTerm);
 }
