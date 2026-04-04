@@ -24,9 +24,6 @@ namespace HomeCook.Api.Controllers
         public async Task<IActionResult> FoodSearchAsync([FromQuery] string foodSearchTerm)
         {
             var foodList = await _foodSearchService.FoodSearchAsync(foodSearchTerm);
-            if (foodList.Count == 0)
-                return NotFound("No matching foods found.");
-
             return Ok(foodList);
         }
     }
