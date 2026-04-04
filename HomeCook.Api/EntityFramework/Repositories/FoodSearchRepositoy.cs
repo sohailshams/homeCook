@@ -29,4 +29,16 @@ public class FoodSearchRepositoy : IFoodSearchRepository
                 .OrderByDescending(f => f.AvailableDate)
                 .ToListAsync();
     }
+
+    public async Task<List<Food>> FoodSearchPostCodeAsync(string foodSearchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(foodSearchTerm))
+            return new List<Food>();
+
+        // PostgreSQL Search for postcode
+        return await _dbContext.Foods
+            .Include("FoodImages")
+            .Where(f => EF.Functions.ILike(f.PostCode, $"%{foodSearchTerm}%"))
+            .ToListAsync();
+    }
 }
