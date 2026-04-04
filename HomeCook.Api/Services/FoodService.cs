@@ -22,6 +22,7 @@ namespace HomeCook.Api.Services
         private readonly ICategoryReposity _categoryReposity;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Cloudinary _cloudinary;
+        private readonly IUserProfileService _userProfileService;
 
         public FoodService(IFoodRepository foodRepository,
                             IMapper mapper,
@@ -29,7 +30,8 @@ namespace HomeCook.Api.Services
                             IUserRepository userRepository,
                             ICategoryReposity categoryReposity,
                             IHttpContextAccessor httpContextAccessor,
-                            Cloudinary cloudinary)
+                            Cloudinary cloudinary,
+                            IUserProfileService userProfileService)
         {
             _foodRepository = foodRepository;
             _mapper = mapper;
@@ -38,6 +40,7 @@ namespace HomeCook.Api.Services
             _categoryReposity = categoryReposity;
             _httpContextAccessor = httpContextAccessor;
             _cloudinary = cloudinary;
+            _userProfileService = userProfileService;
         }
 
         public async Task<List<FoodDTO>> GetFoodListAsync()
@@ -105,6 +108,15 @@ namespace HomeCook.Api.Services
 
                 var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {addFoodDTO.SellerId} not found.");
                 foodModel.Seller = seller;
+
+                var userProfile = await _userProfileService.GetUserProfileAsync(parsedLoggedInUserId);
+
+                if (userProfile == null)
+                {
+                    throw new ValidationException("User Profile must be completed before listing food.");
+                }
+
+                foodModel.PostCode = userProfile.PostCode;
 
                 // Use model to create food object in DB
                 var newFood = await _foodRepository.AddFoodAsync(foodModel);
