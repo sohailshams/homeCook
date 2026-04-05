@@ -136,16 +136,61 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+                var loggedInUserId = Guid.Parse(loggedInUserIdString);
+                if (loggedInUserId != updateProfile.UserId)
+                {
+                    throw new UnauthorizedAccessException("You are not authorized to update profile information in database.");
+                }
 
-                // Convert AddUpdateProfileDTO to model
-                var profileModal = _mapper.Map<Models.Profile>(updateProfile);
-                var updatedProfile = await _userProfileRepository.UpdateUserProfileAsync(loggedInUserId, profileModal) ?? throw new NotFoundException("Profile informaton not found.");
+                var existingProfile = await _userProfileRepository.GetUserProfileByIdAsync(updateProfile.UserId);
+                if (existingProfile == null)
+                {
+                    throw new NotFoundException($"Profile with ID {updateProfile.UserId} was not found.");
+                }
 
-                // Convert Profile model to UserProfileDTO
-                var updatedProfileDto = _mapper.Map<UserProfileDTO>(updatedProfile);
+                var addressList = await _userAddressRepository.GetUserAddressListByIdAsync(updateProfile.UserId);
+                var primaryAddress = addressList.FirstOrDefault(a => a.IsPrimary);
 
-                return updatedProfileDto;
+                var user = await _userRepository.GetUserByIdAsync(updateProfile.UserId) ?? throw new NotFoundException($"User with ID {updateProfile.UserId} not found.");
+
+                // update Address model
+                primaryAddress.City = updateProfile.City;
+                primaryAddress.Country = updateProfile.Country;
+                primaryAddress.IsPrimary = true;
+                primaryAddress.AddressLine1 = updateProfile.AddressLine1;
+                primaryAddress.PostCode = updateProfile.PostCode;
+                primaryAddress.User = user;
+                primaryAddress.UserId = updateProfile.UserId;
+
+                // update Profile model
+                existingProfile.UserId = updateProfile.UserId;
+                existingProfile.FirstName = updateProfile.FirstName;
+                existingProfile.LastName = updateProfile.LastName;
+                existingProfile.PhoneNumber = updateProfile.PhoneNumber;
+                existingProfile.User = user;
+                existingProfile.Bio = updateProfile.Bio;
+                existingProfile.ProfileImage = updateProfile.ProfileImage;
+
+                var profileWithAddress = await _userProfileRepository.UpdateUserProfileAddressAsync(existingProfile, primaryAddress);
+
+
+                var userProfileDto = new UserProfileDTO
+                {
+                    UserId = profileWithAddress.Profile.UserId,
+                    FirstName = profileWithAddress.Profile.FirstName,
+                    LastName = profileWithAddress.Profile.LastName,
+                    PhoneNumber = profileWithAddress.Profile.PhoneNumber,
+                    Bio = profileWithAddress.Profile.Bio,
+                    ProfileImage = profileWithAddress.Profile.ProfileImage,
+                    City = profileWithAddress.Address.City,
+                    Country = profileWithAddress.Address.Country,
+                    AddressLine1 = profileWithAddress.Address.AddressLine1,
+                    PostCode = profileWithAddress.Address.PostCode,
+                    IsPrimary = profileWithAddress.Address.IsPrimary
+                };
+
+                return userProfileDto;
             }
             catch (DbUpdateException exception)
             {
