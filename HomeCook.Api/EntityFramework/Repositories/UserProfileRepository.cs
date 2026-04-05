@@ -66,5 +66,10 @@ namespace HomeCook.Api.EntityFramework.Repositories
             await _dbContext.SaveChangesAsync();
             return new ProfileWithAddress(profile, address);
         }
+        public async Task<ProfileWithAddress> UpdateUserProfileAddressAsync(Profile profile, Address address)
+        {
+            await _dbContext.SaveChangesAsync();
+            return new ProfileWithAddress(profile, address);
+        }
     }
 }
