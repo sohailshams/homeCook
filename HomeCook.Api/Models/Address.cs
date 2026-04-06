@@ -1,5 +1,4 @@
-using System;
-
+using NetTopologySuite.Geometries;
 namespace HomeCook.Api.Models;
 
 public class Address
@@ -12,5 +11,6 @@ public class Address
     public string City { get; set; }
     public string PostCode { get; set; }
     public string Country { get; set; }
+    public Point Location { get; set; } = null!;
 }
 
