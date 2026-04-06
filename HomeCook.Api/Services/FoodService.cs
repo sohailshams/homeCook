@@ -116,8 +116,6 @@ namespace HomeCook.Api.Services
                     throw new ValidationException("User Profile must be completed before listing food.");
                 }
 
-                foodModel.PostCode = userProfile.PostCode;
-
                 // Use model to create food object in DB
                 var newFood = await _foodRepository.AddFoodAsync(foodModel);
                 var imagePublicIds = newFood.FoodImages.Select(x => x.PublicId).ToList();
