@@ -38,7 +38,7 @@ public class FoodSearchRepositoy : IFoodSearchRepository
         // PostgreSQL Search for postcode
         return await _dbContext.Foods
             .Include("FoodImages")
-            .Where(f => EF.Functions.ILike(f.PostCode, $"%{foodSearchTerm}%"))
+            .Where(f => f.Seller.Addresses.Any(a => EF.Functions.ILike(a.PostCode, $"%{foodSearchTerm}%") && a.IsPrimary))
             .ToListAsync();
     }
 }
