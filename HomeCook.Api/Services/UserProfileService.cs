@@ -17,18 +17,21 @@ namespace HomeCook.Api.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
+        private readonly IPostcodeService _postcodeService;
 
         public UserProfileService(IMapper mapper,
             IUserProfileRepository userProfileRepository,
             IHttpContextAccessor httpContextAccessor,
             IUserRepository userRepository,
-            IUserAddressRepository userAddressRepository)
+            IUserAddressRepository userAddressRepository,
+            IPostcodeService postcodeService)
         {
             _mapper = mapper;
             _userProfileRepository = userProfileRepository;
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;
+            _postcodeService = postcodeService;
         }
 
         public async Task<UserProfileDTO?> GetUserProfileAsync(Guid userId)
@@ -91,7 +94,8 @@ namespace HomeCook.Api.Services
                     AddressLine1 = addUpdateProfileDTO.AddressLine1,
                     PostCode = addUpdateProfileDTO.PostCode,
                     User = user,
-                    UserId = addUpdateProfileDTO.UserId
+                    UserId = addUpdateProfileDTO.UserId,
+                    Location = await _postcodeService.GetLocationAsync(addUpdateProfileDTO.PostCode)
                 };
 
                 // Create Profile model from AddUpdateProfileDTO
@@ -162,6 +166,7 @@ namespace HomeCook.Api.Services
                 primaryAddress.PostCode = updateProfile.PostCode;
                 primaryAddress.User = user;
                 primaryAddress.UserId = updateProfile.UserId;
+                primaryAddress.Location = await _postcodeService.GetLocationAsync(updateProfile.PostCode);
 
                 // update Profile model
                 existingProfile.UserId = updateProfile.UserId;
