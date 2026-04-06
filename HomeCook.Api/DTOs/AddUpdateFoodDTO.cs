@@ -11,6 +11,5 @@
         public Guid CategoryId { get; set; }
         public List<FoodImageDTO> FoodImages { get; set; }
         public Guid SellerId { get; set; }
-        public string PostCode { get; set; }
     }
 }
