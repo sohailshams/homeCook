@@ -40,11 +40,16 @@ builder.Services.AddSwaggerGen(c =>
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString, o => o.UseNetTopologySuite()));
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>();
+
+builder.Services.AddHttpClient<IPostcodeService, PostcodeService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ExternalApis:PostcodeApi"]!);
+});
 
 // TODO - Remember to SameSiteMode.None to SameSiteMode.Strict when deploying
 
