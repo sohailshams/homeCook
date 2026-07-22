@@ -1,4 +1,5 @@
 ﻿using HomeCook.Api.DTOs;
+using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using HomeCook.Api.Projections;
 using Microsoft.EntityFrameworkCore;
@@ -51,14 +52,14 @@ namespace HomeCook.Api.EntityFramework.Repositories
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId);
             if (user == null)
             {
-                throw new Exception($"User with ID {profile.UserId} not found.");
+                throw new DatabaseOperationException($"User with ID {profile.UserId} not found.", new Exception());
             }
             user.IsProfileComplete = true;
 
             var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == profile.UserId);
             if (existingProfile != null)
             {
-                throw new Exception($"A profile with {profile.UserId} already exists.");
+                throw new DatabaseOperationException($"A profile with {profile.UserId} already exists.", new Exception());
             }
 
             await _dbContext.Profiles.AddAsync(profile);
