@@ -24,5 +24,13 @@ namespace HomeCook.Api.Controllers
             var user = await _userService.GetUserInfoAsync();
             return Ok(user);
         }
+
+        [HttpGet("user-with-postcode")]
+        [Authorize]
+        public async Task<IActionResult> GetUserAndPostCodeInfo()
+        {
+            var userAndPostCodeInfo = await _userService.GetUserAndPostCodeInfoAsync();
+            return Ok(userAndPostCodeInfo);
+        }
     }
 }
