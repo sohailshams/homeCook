@@ -13,13 +13,47 @@ namespace HomeCook.Api.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
+        private readonly IUserAddressRepository _userAddressRepository;
 
-        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository)
+        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository, IUserAddressRepository userAddressRepository)
         {
             _mapper = mapper;
             _userRepository = userRepository;
+            _userAddressRepository = userAddressRepository;
             _httpContextAccessor = httpContextAccessor;
         }
+
+        public async Task<UserInfoDTO> GetUserAndPostCodeInfoAsync()
+        {
+            try
+            {
+                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+                var loggedInUserId = Guid.Parse(loggedInUserIdString);
+                var user = await _userRepository.GetUserByIdAsync(loggedInUserId);
+                if (user == null)
+                {
+                    throw new NotFoundException($"User with ID {loggedInUserId} was not found.");
+                }
+                var address = await _userAddressRepository.GetUserAddressListByIdAsync(loggedInUserId);
+                var primaryAddress = address.FirstOrDefault(a => a.IsPrimary);
+
+                var userAndPostCodeInfoDTO = new UserInfoDTO
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    UserEmail = user.Email,
+                    IsProfileComplete = user.IsProfileComplete,
+                    PostCode = primaryAddress?.PostCode ?? null
+                };
+                return userAndPostCodeInfoDTO;
+
+            }
+            catch (Exception exception) when (exception is not NotFoundException)
+            {
+                throw new DatabaseOperationException("An unexpected error occurred while retrieving user profile.", exception);
+            }
+        }
+
         public async Task<UserInfoDTO?> GetUserInfoAsync()
         {
             try
