@@ -21,9 +21,13 @@ namespace HomeCook.Api.Controllers
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> GetFoodList()
+        public async Task<IActionResult> GetFoodList([FromQuery] string postCode, [FromQuery] double? radius)
         {
-            var food = await _foodService.GetFoodListAsync();
+            if (string.IsNullOrWhiteSpace(postCode) && radius == null)
+            {
+                throw new InvalidOperationException($"PostCode and Radius are required.");
+            }
+            var food = await _foodService.GetFoodListAsync(postCode, radius);
             return Ok(food);
         }
 
@@ -51,7 +55,7 @@ namespace HomeCook.Api.Controllers
         [Authorize]
         public async Task<IActionResult> AddFood([FromBody] AddUpdateFoodDTO addFood)
         {
-             var newFood = await _foodService.AddFoodAsync(addFood);
+            var newFood = await _foodService.AddFoodAsync(addFood);
             return Ok(newFood);
         }
 
@@ -70,7 +74,8 @@ namespace HomeCook.Api.Controllers
         public async Task<IActionResult> DeleteFood([FromRoute] Guid foodId)
         {
             var food = await _foodService.DeleteFoodByIdAsync(foodId);
-            return Ok(new {
+            return Ok(new
+            {
                 Message = "Food deleted successfully",
                 Food = food
             });

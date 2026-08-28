@@ -23,6 +23,7 @@ namespace HomeCook.Api.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Cloudinary _cloudinary;
         private readonly IUserProfileService _userProfileService;
+        private readonly IPostcodeService _postcodeService;
 
         public FoodService(IFoodRepository foodRepository,
                             IMapper mapper,
@@ -31,7 +32,8 @@ namespace HomeCook.Api.Services
                             ICategoryReposity categoryReposity,
                             IHttpContextAccessor httpContextAccessor,
                             Cloudinary cloudinary,
-                            IUserProfileService userProfileService)
+                            IUserProfileService userProfileService,
+                            IPostcodeService postcodeService)
         {
             _foodRepository = foodRepository;
             _mapper = mapper;
@@ -41,12 +43,15 @@ namespace HomeCook.Api.Services
             _httpContextAccessor = httpContextAccessor;
             _cloudinary = cloudinary;
             _userProfileService = userProfileService;
+            _postcodeService = postcodeService;
         }
 
-        public async Task<List<FoodDTO>> GetFoodListAsync()
+        public async Task<List<FoodDTO>> GetFoodListAsync(string postCode, double? radius)
         {
             // get food list from db
-            var food = await _foodRepository.GetFoodListAsync();
+            var location = await _postcodeService.GetLocationAsync(postCode);
+
+            var food = await _foodRepository.GetFoodListAsync(location, radius);
 
             // map food list<Food> to food list<FoodDTO>
             var foodDto = _mapper.Map<List<FoodDTO>>(food);

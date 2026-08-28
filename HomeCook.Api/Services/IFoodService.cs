@@ -4,7 +4,7 @@ namespace HomeCook.Api.Services
 {
     public interface IFoodService
     {
-        public Task<List<FoodDTO>> GetFoodListAsync();
+        public Task<List<FoodDTO>> GetFoodListAsync(string postCode, double? radius);
         public Task<FoodDetailDTO?> GetFoodDetailAsync(Guid foodId);
         public Task<List<FoodDTO>> GetFoodByCategoryIdAsync(Guid categoryId);
         public Task<FoodDTO> AddFoodAsync(AddUpdateFoodDTO addFoodDTO);
