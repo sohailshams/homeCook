@@ -1,5 +1,6 @@
 ﻿using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 
 namespace HomeCook.Api.EntityFramework.Repositories
 {
@@ -12,10 +13,41 @@ namespace HomeCook.Api.EntityFramework.Repositories
             this.dbContext = dbContext;
         }
 
-        public async Task<List<Food>> GetFoodListAsync()
+        public async Task<List<Food>> GetFoodListAsync(Point location, double? radius)
         {
-            var food = await dbContext.Foods.Include("Category").Include("FoodImages").Where(f => f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
-            return food;
+            var baseQuery = dbContext.Foods
+                .Where(f => f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59));
+
+            if (location != null && radius != null)
+            {
+                double meters = radius.Value * 1609.34;
+
+                // Find seller ids within radius, ordered by distance, pushed to SQL
+                var matches = await dbContext.Addresses
+                    .Where(a => a.IsPrimary && a.Location.IsWithinDistance(location, meters))
+                    .Join(baseQuery,
+                          a => a.UserId,
+                          f => f.SellerId,
+                          (a, f) => new { f.Id, Distance = a.Location.Distance(location) })
+                    .OrderBy(x => x.Distance)
+                    .ToListAsync();
+
+                var orderedIds = matches.Select(x => x.Id).ToList();
+
+                var foods = await dbContext.Foods
+                    .Include(f => f.Category)
+                    .Include(f => f.FoodImages)
+                    .Where(f => orderedIds.Contains(f.Id))
+                    .ToListAsync();
+
+                // preserve distance ordering
+                return foods.OrderBy(f => orderedIds.IndexOf(f.Id)).ToList();
+            }
+
+            return await baseQuery
+                .Include(f => f.Category)
+                .Include(f => f.FoodImages)
+                .ToListAsync();
         }
 
         public async Task<Food?> GetFoodDetailAsync(Guid foodId)
