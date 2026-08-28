@@ -37,6 +37,23 @@ namespace HomeCook.Api.EntityFramework
                     f => new { f.Name, f.Description })
                 .HasIndex(f => f.SearchVector)
                 .HasMethod("GIN");
+
+            // Address <-> User (one-to-many)
+            modelBuilder.Entity<Address>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.Addresses)
+                .HasForeignKey(a => a.UserId);
+
+            // Store as geography so distances are in meters, not degrees
+            modelBuilder.Entity<Address>()
+                .Property(a => a.Location)
+                .HasColumnType("geography (Point, 4326)");
+
+            // Only one primary address per user
+            modelBuilder.Entity<Address>()
+                .HasIndex(a => a.UserId)
+                .HasFilter("\"IsPrimary\" = true")
+                .IsUnique();
         }
     }
 }
