@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Stripe;
 
 namespace HomeCook.Api.Exceptions
 {
@@ -57,6 +58,14 @@ namespace HomeCook.Api.Exceptions
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;
                     errorMessage = "An unexpected error occurred.";
+                    break;
+
+                case StripeException stripeEx:
+                    var isCardError = stripeEx.StripeError?.Type == "card_error";
+                    statusCode = isCardError ? StatusCodes.Status402PaymentRequired : StatusCodes.Status502BadGateway;
+                    errorMessage = isCardError
+                        ? stripeEx.StripeError!.Message
+                        : "Payment service is unavailable. Please try again.";
                     break;
             }
 
