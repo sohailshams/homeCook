@@ -1,4 +1,5 @@
-﻿using NpgsqlTypes;
+﻿using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 
 namespace HomeCook.Api.Models
 {
@@ -7,6 +8,7 @@ namespace HomeCook.Api.Models
         public Guid Id { get; set; }
         public DateTime AvailableDate { get; set; }
         public required string Name { get; set; }
+        [Precision(10, 2)]
         public decimal Price { get; set; }
         public required string Description { get; set; }
         public required List<string> Ingredients { get; set; }
