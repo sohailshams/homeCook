@@ -7,5 +7,6 @@
         public string UserEmail { get; set; }
         public bool IsProfileComplete { get; set; }
         public string? PostCode { get; set; }
+        public List<string> Roles { get; set; } = [];
     }
 }
