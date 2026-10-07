@@ -44,7 +44,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentityApiEndpoints<User>()
     .AddRoles<IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddUserManager<AppUserManager>();
 
 builder.Services.AddHttpClient<IPostcodeService, PostcodeService>(client =>
 {
@@ -62,7 +63,23 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromHours(24);
     options.SlidingExpiration = true;
     options.Cookie.Expiration = null;
+
+    // API: return status codes instead of redirecting to login / access denied pages
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
 });
+
+// Re-validate the cookie against the database every 5 minutes so role changes apply quickly
+builder.Services.Configure<SecurityStampValidatorOptions>(options =>
+    options.ValidationInterval = TimeSpan.FromMinutes(5));
 
 
 builder.Services.AddCors(options =>
@@ -103,6 +120,12 @@ builder.Services.AddScoped<IUserAddressService, UserAddressService>();
 builder.Services.AddAutoMapper(typeof(AutoMapping));
 
 var app = builder.Build();
+
+// Create roles and promote configured admin emails
+using (var scope = app.Services.CreateScope())
+{
+    await IdentitySeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
