@@ -3,6 +3,7 @@ using HomeCook.Api.DTOs;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -14,13 +15,15 @@ namespace HomeCook.Api.Services
         private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
+        private readonly UserManager<User> _userManager;
 
-        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository, IUserAddressRepository userAddressRepository)
+        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository, IUserAddressRepository userAddressRepository, UserManager<User> userManager)
         {
             _mapper = mapper;
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
 
         public async Task<UserInfoDTO> GetUserAndPostCodeInfoAsync()
@@ -43,7 +46,8 @@ namespace HomeCook.Api.Services
                     UserName = user.UserName,
                     UserEmail = user.Email,
                     IsProfileComplete = user.IsProfileComplete,
-                    PostCode = primaryAddress?.PostCode ?? null
+                    PostCode = primaryAddress?.PostCode ?? null,
+                    Roles = (await _userManager.GetRolesAsync(user)).ToList()
                 };
                 return userAndPostCodeInfoDTO;
 
@@ -64,6 +68,7 @@ namespace HomeCook.Api.Services
 
                 // Map user model to UserInfoDTO
                 var userInfoDto = _mapper.Map<UserInfoDTO>(user);
+                userInfoDto.Roles = (await _userManager.GetRolesAsync(user)).ToList();
 
                 return userInfoDto;
 
