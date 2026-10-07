@@ -1,5 +1,7 @@
+using HomeCook.Api.Constants;
 using HomeCook.Api.DTOs;
 using HomeCook.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCook.Api.Controllers
@@ -25,6 +27,7 @@ namespace HomeCook.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> AddCategory([FromBody] AddUpdateCategoryDTO addCategory)
         {
             var newCategory = await _categoriesService.AddCategoryAsync(addCategory);
@@ -35,6 +38,7 @@ namespace HomeCook.Api.Controllers
 
         [HttpPut]
         [Route("{categoryId:Guid}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> UpdateCategory([FromRoute] Guid categoryId, [FromBody] AddUpdateCategoryDTO updatedCategory)
         {
             var category = await _categoriesService.UpdateCategoryByIdAsync(categoryId, updatedCategory);
@@ -48,6 +52,7 @@ namespace HomeCook.Api.Controllers
 
         [HttpDelete]
         [Route("{categoryId:Guid}")]
+        [Authorize(Roles = Roles.Admin)]
         public async Task<IActionResult> DeleteCategory([FromRoute] Guid categoryId)
         {
             var category = await _categoriesService.DeleteCategoryByIdAsync(categoryId);
