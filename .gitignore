@@ -46,3 +46,7 @@ Notes.txt
 ~/.microsoft/usersecrets/
 
 TestData/
+
+.claude/
+CLAUDE.md
+codeReview.md
