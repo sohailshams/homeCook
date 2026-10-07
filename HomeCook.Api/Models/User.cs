@@ -1,5 +1,4 @@
-﻿using HomeCook.Api.Enums;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace HomeCook.Api.Models
 {
