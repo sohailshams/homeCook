@@ -47,6 +47,8 @@ namespace HomeCook.Api.Controllers
             {
                 Amount = amountInPence,
                 Currency = "gbp",
+                // Only authorize (hold) the card - the webhook captures it after claiming stock
+                CaptureMethod = "manual",
                 AutomaticPaymentMethods = new() { Enabled = true },
                 Metadata = new Dictionary<string, string>
                 {
