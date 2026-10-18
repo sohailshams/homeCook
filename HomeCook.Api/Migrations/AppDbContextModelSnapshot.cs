@@ -172,12 +172,24 @@ namespace HomeCook.Api.Migrations
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("StripePaymentIntentId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("numeric");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BuyerId");
+
+                    b.HasIndex("StripePaymentIntentId")
+                        .IsUnique();
 
                     b.ToTable("Orders");
                 });
@@ -195,7 +207,8 @@ namespace HomeCook.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
