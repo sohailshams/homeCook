@@ -1,4 +1,6 @@
-﻿namespace HomeCook.Api.Models
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace HomeCook.Api.Models
 {
     public class OrderItem
     {
@@ -8,6 +10,7 @@
         public required Guid FoodId { get; set; }
         public Food Food { get; set; } = null!;
         public int Quantity { get; set; }
+        [Precision(10, 2)]
         public decimal Price { get; set; }
     }
 }
