@@ -10,6 +10,5 @@
         public DateTime AvailableDate { get; set; }
         public Guid CategoryId { get; set; }
         public List<FoodImageDTO> FoodImages { get; set; }
-        public Guid SellerId { get; set; }
     }
 }

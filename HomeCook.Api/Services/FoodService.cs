@@ -95,9 +95,9 @@ namespace HomeCook.Api.Services
             {
                 var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
 
-                if (!Guid.TryParse(loggedInUserId, out Guid parsedLoggedInUserId) || parsedLoggedInUserId != addFoodDTO.SellerId)
+                if (!Guid.TryParse(loggedInUserId, out Guid parsedLoggedInUserId))
                 {
-                    throw new UnauthorizedAccessException("You are not authorized to create a food.");
+                    throw new UnauthorizedAccessException("Unauthorized user.");
                 }
 
                 if (addFoodDTO.FoodImages == null || addFoodDTO.FoodImages.Count == 0)
@@ -108,10 +108,13 @@ namespace HomeCook.Api.Services
                 // Convert addFoodDTO to model
                 var foodModel = _mapper.Map<Food>(addFoodDTO);
 
+                // The seller is always the logged-in user, never a value from the request
+                foodModel.SellerId = parsedLoggedInUserId;
+
                 var category = await _categoryReposity.GetCategoryByIdAsync(foodModel.CategoryId) ?? throw new NotFoundException($"Category with ID {addFoodDTO.CategoryId} not found.");
                 foodModel.Category = category;
 
-                var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {addFoodDTO.SellerId} not found.");
+                var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {parsedLoggedInUserId} not found.");
                 foodModel.Seller = seller;
 
                 var userProfile = await _userProfileService.GetUserProfileAsync(parsedLoggedInUserId);
@@ -160,7 +163,6 @@ namespace HomeCook.Api.Services
                 existingFood.Price = updateFoodModal.Price;
                 existingFood.CategoryId = updateFoodModal.CategoryId;
                 existingFood.Ingredients = updateFoodModal.Ingredients;
-                existingFood.SellerId = updateFoodModal.SellerId;
                 if (updateFoodModal.FoodImages != null && updateFoodModal.FoodImages.Count > 0)
                 {
                     existingFood.FoodImages = updateFoodModal.FoodImages.Select(image => new FoodImageDTO
