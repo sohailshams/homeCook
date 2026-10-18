@@ -1,6 +1,6 @@
 ﻿namespace HomeCook.Api.DTOs
 {
-    public class UserInfoDTO
+    public class UserInfoDto
     {
         public Guid Id { get; set; }
         public string UserName { get; set; }

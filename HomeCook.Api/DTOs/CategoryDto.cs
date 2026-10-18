@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace HomeCook.Api.DTOs
 {
-    public class CategoryDTO
+    public class CategoryDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

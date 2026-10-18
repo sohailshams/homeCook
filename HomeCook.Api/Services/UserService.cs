@@ -26,7 +26,7 @@ namespace HomeCook.Api.Services
             _userManager = userManager;
         }
 
-        public async Task<UserInfoDTO> GetUserAndPostCodeInfoAsync()
+        public async Task<UserInfoDto> GetUserAndPostCodeInfoAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace HomeCook.Api.Services
                 var address = await _userAddressRepository.GetUserAddressListByIdAsync(loggedInUserId);
                 var primaryAddress = address.FirstOrDefault(a => a.IsPrimary);
 
-                var userAndPostCodeInfoDTO = new UserInfoDTO
+                var userAndPostCodeInfoDto = new UserInfoDto
                 {
                     Id = user.Id,
                     UserName = user.UserName,
@@ -49,7 +49,7 @@ namespace HomeCook.Api.Services
                     PostCode = primaryAddress?.PostCode ?? null,
                     Roles = (await _userManager.GetRolesAsync(user)).ToList()
                 };
-                return userAndPostCodeInfoDTO;
+                return userAndPostCodeInfoDto;
 
             }
             catch (Exception exception) when (exception is not NotFoundException)
@@ -58,7 +58,7 @@ namespace HomeCook.Api.Services
             }
         }
 
-        public async Task<UserInfoDTO?> GetUserInfoAsync()
+        public async Task<UserInfoDto?> GetUserInfoAsync()
         {
             try
             {
@@ -66,8 +66,8 @@ namespace HomeCook.Api.Services
                 var loggedInUserId = Guid.Parse(loggedInUserIdString);
                 var user = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException("User not found.");
 
-                // Map user model to UserInfoDTO
-                var userInfoDto = _mapper.Map<UserInfoDTO>(user);
+                // Map user model to UserInfoDto
+                var userInfoDto = _mapper.Map<UserInfoDto>(user);
                 userInfoDto.Roles = (await _userManager.GetRolesAsync(user)).ToList();
 
                 return userInfoDto;

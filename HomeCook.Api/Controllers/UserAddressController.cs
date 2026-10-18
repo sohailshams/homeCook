@@ -21,9 +21,9 @@ namespace HomeCook.Api.Controllers
 
         [HttpPut("AddUserAddress")]
         [Authorize]
-        public async Task<IActionResult> AddUserAddress([FromBody] AddressRequestDTO addAddressDTO)
+        public async Task<IActionResult> AddUserAddress([FromBody] AddressRequestDto addAddressDto)
         {
-            var newAddress = await _userAddressService.AddAddressAsync(addAddressDTO);
+            var newAddress = await _userAddressService.AddAddressAsync(addAddressDto);
             return Ok(newAddress);
         }
     }

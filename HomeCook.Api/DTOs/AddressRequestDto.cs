@@ -2,7 +2,7 @@
 
 namespace HomeCook.Api.DTOs
 {
-    public class AddressRequestDTO
+    public class AddressRequestDto
     {
         public required Guid UserId { get; set; }
         public required string AddressLine1 { get; set; }

@@ -4,7 +4,7 @@ namespace HomeCook.Api.Services
 {
     public interface IUserService
     {
-        public Task<UserInfoDTO?> GetUserInfoAsync();
-        public Task<UserInfoDTO> GetUserAndPostCodeInfoAsync();
+        public Task<UserInfoDto?> GetUserInfoAsync();
+        public Task<UserInfoDto> GetUserAndPostCodeInfoAsync();
     }
 }

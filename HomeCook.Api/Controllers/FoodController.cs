@@ -53,7 +53,7 @@ namespace HomeCook.Api.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddFood([FromBody] AddUpdateFoodDTO addFood)
+        public async Task<IActionResult> AddFood([FromBody] CreateFoodDto addFood)
         {
             var newFood = await _foodService.AddFoodAsync(addFood);
             return Ok(newFood);
@@ -62,7 +62,7 @@ namespace HomeCook.Api.Controllers
         [HttpPut]
         [Route("{foodId:Guid}")]
         [Authorize]
-        public async Task<IActionResult> UpdateFood([FromRoute] Guid foodId, [FromBody] AddUpdateFoodDTO updateFood)
+        public async Task<IActionResult> UpdateFood([FromRoute] Guid foodId, [FromBody] UpdateFoodDto updateFood)
         {
             var food = await _foodService.UpdateFoodAsync(foodId, updateFood);
             return Ok(food);

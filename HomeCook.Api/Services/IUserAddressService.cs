@@ -4,6 +4,6 @@ namespace HomeCook.Api.Services
 {
     public interface IUserAddressService
     {
-        public Task<AddressRequestDTO> AddAddressAsync(AddressRequestDTO addressRequestDTO);
+        public Task<AddressRequestDto> AddAddressAsync(AddressRequestDto addressRequestDto);
     }
 }

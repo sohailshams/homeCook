@@ -18,7 +18,7 @@ public class FoodSearchService : IFoodSearchService
         _foodSearchRepository = foodSearchRepository;
         _mapper = mapper;
     }
-    public async Task<List<FoodDTO>> FoodSearchAsync(string foodSearchTerm)
+    public async Task<List<FoodDto>> FoodSearchAsync(string foodSearchTerm)
     {
         try
         {
@@ -34,13 +34,13 @@ public class FoodSearchService : IFoodSearchService
                 foodList = await _foodSearchRepository.FoodSearchAsync(foodSearchTerm);
             }
 
-            // map food list<Food> to food list<FoodDTO>
+            // map food list<Food> to food list<FoodDto>
             if (foodList != null && foodList.Count > 0)
             {
-                var foodDto = _mapper.Map<List<FoodDTO>>(foodList);
+                var foodDto = _mapper.Map<List<FoodDto>>(foodList);
                 return foodDto;
             }
-            return new List<FoodDTO>();
+            return new List<FoodDto>();
         }
         catch (DbUpdateException exception)
         {

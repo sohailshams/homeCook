@@ -19,28 +19,28 @@ namespace HomeCook.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<List<CategoryDTO>> GetCategoriesAsync()
+        public async Task<List<CategoryDto>> GetCategoriesAsync()
         {
             // get categories from db
             var categories = await _categoriesReposity.GetCategoriesAsync();
 
-            // map categories<Category> to categories<CategoryDTO>
-            var categoriesDto = _mapper.Map<List<CategoryDTO>>(categories);
+            // map categories<Category> to categories<CategoryDto>
+            var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
             return categoriesDto;
         }
 
-        public async Task<CategoryDTO> AddCategoryAsync(AddUpdateCategoryDTO addCategory)
+        public async Task<CategoryDto> AddCategoryAsync(AddUpdateCategoryDto addCategory)
         {
             try
             {
-            // Convert AddCategoryDTO to model
+            // Convert AddCategoryDto to model
             var categoryModel = _mapper.Map<Category>(addCategory);
 
             // Use model to create category in DB
             var newCategory = await _categoriesReposity.AddCategoryAsync(categoryModel) ??  throw new ValidationException("Category with same name already exist."); ;
             
             //Map model to DTO
-            var categoryDto = _mapper.Map<CategoryDTO>(newCategory);
+            var categoryDto = _mapper.Map<CategoryDto>(newCategory);
 
             return categoryDto;
 
@@ -52,16 +52,16 @@ namespace HomeCook.Api.Services
         }
 
 
-        public async Task<CategoryDTO> UpdateCategoryByIdAsync(Guid categoryId, AddUpdateCategoryDTO updateCategory)
+        public async Task<CategoryDto> UpdateCategoryByIdAsync(Guid categoryId, AddUpdateCategoryDto updateCategory)
         {
             try
             {
-                // Convert AddCategoryDTO to model
+                // Convert AddCategoryDto to model
                 var categoryModel = _mapper.Map<Category>(updateCategory);
                 var category = await _categoriesReposity.UpdateCategoryAsync(categoryId, categoryModel) ?? throw new ValidationException("Category not found.");
 
                 //Map model to DTO
-                var categoryDto = _mapper.Map<CategoryDTO>(category);
+                var categoryDto = _mapper.Map<CategoryDto>(category);
                 return categoryDto;
 
             }
@@ -72,14 +72,14 @@ namespace HomeCook.Api.Services
             }
         }
 
-        public async Task<CategoryDTO> DeleteCategoryByIdAsync(Guid categoryId)
+        public async Task<CategoryDto> DeleteCategoryByIdAsync(Guid categoryId)
         {
             try
             {
                 var category = await _categoriesReposity.DeleteCategoryAsync(categoryId) ?? throw new NotFoundException("Category not found.");
 
                 //Map model to DTO
-                var categoryDto = _mapper.Map<CategoryDTO>(category);
+                var categoryDto = _mapper.Map<CategoryDto>(category);
                 return categoryDto;
 
             } catch(DbUpdateException exception)

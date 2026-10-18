@@ -2,7 +2,7 @@
 
 namespace HomeCook.Api.DTOs
 {
-    public class AddUpdateProfileDTO
+    public class AddUpdateProfileDto
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }

@@ -34,7 +34,7 @@ namespace HomeCook.Api.Services
             _postcodeService = postcodeService;
         }
 
-        public async Task<UserProfileDTO?> GetUserProfileAsync(Guid userId)
+        public async Task<UserProfileDto?> GetUserProfileAsync(Guid userId)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace HomeCook.Api.Services
                 {
                     throw new NotFoundException($"Address with ID {userId} was not found.");
                 }
-                var userProfileDTO = new UserProfileDTO
+                var userProfileDto = new UserProfileDto
                 {
                     UserId = userProfileModel.UserId,
                     FirstName = userProfileModel.FirstName,
@@ -63,7 +63,7 @@ namespace HomeCook.Api.Services
                     PostCode = primaryAddress.PostCode,
                     IsPrimary = primaryAddress.IsPrimary
                 };
-                return userProfileDTO;
+                return userProfileDto;
 
             }
             catch (Exception exception) when (exception is not NotFoundException)
@@ -72,48 +72,48 @@ namespace HomeCook.Api.Services
             }
         }
 
-        public async Task<UserProfileDTO> AddUserProfileAsync(AddUpdateProfileDTO addUpdateProfileDTO)
+        public async Task<UserProfileDto> AddUserProfileAsync(AddUpdateProfileDto addUpdateProfileDto)
         {
             try
             {
                 var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
                 var loggedInUserId = Guid.Parse(loggedInUserIdString);
-                if (loggedInUserId != addUpdateProfileDTO.UserId)
+                if (loggedInUserId != addUpdateProfileDto.UserId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized to add profile information in database.");
                 }
 
-                var user = await _userRepository.GetUserByIdAsync(addUpdateProfileDTO.UserId) ?? throw new NotFoundException($"User with ID {addUpdateProfileDTO.UserId} not found.");
+                var user = await _userRepository.GetUserByIdAsync(addUpdateProfileDto.UserId) ?? throw new NotFoundException($"User with ID {addUpdateProfileDto.UserId} not found.");
 
-                // Create Address model from AddUpdateProfileDTO
+                // Create Address model from AddUpdateProfileDto
                 var addressModel = new Address
                 {
-                    City = addUpdateProfileDTO.City,
-                    Country = addUpdateProfileDTO.Country,
+                    City = addUpdateProfileDto.City,
+                    Country = addUpdateProfileDto.Country,
                     IsPrimary = true,
-                    AddressLine1 = addUpdateProfileDTO.AddressLine1,
-                    PostCode = addUpdateProfileDTO.PostCode,
+                    AddressLine1 = addUpdateProfileDto.AddressLine1,
+                    PostCode = addUpdateProfileDto.PostCode,
                     User = user,
-                    UserId = addUpdateProfileDTO.UserId,
-                    Location = await _postcodeService.GetLocationAsync(addUpdateProfileDTO.PostCode)
+                    UserId = addUpdateProfileDto.UserId,
+                    Location = await _postcodeService.GetLocationAsync(addUpdateProfileDto.PostCode)
                 };
 
-                // Create Profile model from AddUpdateProfileDTO
+                // Create Profile model from AddUpdateProfileDto
                 var profileModel = new HomeCook.Api.Models.Profile
                 {
-                    UserId = addUpdateProfileDTO.UserId,
-                    FirstName = addUpdateProfileDTO.FirstName,
-                    LastName = addUpdateProfileDTO.LastName,
-                    PhoneNumber = addUpdateProfileDTO.PhoneNumber,
+                    UserId = addUpdateProfileDto.UserId,
+                    FirstName = addUpdateProfileDto.FirstName,
+                    LastName = addUpdateProfileDto.LastName,
+                    PhoneNumber = addUpdateProfileDto.PhoneNumber,
                     User = user,
-                    Bio = addUpdateProfileDTO.Bio,
-                    ProfileImage = addUpdateProfileDTO.ProfileImage
+                    Bio = addUpdateProfileDto.Bio,
+                    ProfileImage = addUpdateProfileDto.ProfileImage
                 };
 
                 var profileWithAddress = await _userProfileRepository.AddUserProfileAddressAsync(profileModel, addressModel);
 
 
-                var userProfileDto = new UserProfileDTO
+                var userProfileDto = new UserProfileDto
                 {
                     UserId = profileWithAddress.Profile.UserId,
                     FirstName = profileWithAddress.Profile.FirstName,
@@ -136,7 +136,7 @@ namespace HomeCook.Api.Services
             }
         }
 
-        public async Task<UserProfileDTO?> UpdateUserProfileAsync(AddUpdateProfileDTO updateProfile)
+        public async Task<UserProfileDto?> UpdateUserProfileAsync(AddUpdateProfileDto updateProfile)
         {
             try
             {
@@ -180,7 +180,7 @@ namespace HomeCook.Api.Services
                 var profileWithAddress = await _userProfileRepository.UpdateUserProfileAddressAsync(existingProfile, primaryAddress);
 
 
-                var userProfileDto = new UserProfileDTO
+                var userProfileDto = new UserProfileDto
                 {
                     UserId = profileWithAddress.Profile.UserId,
                     FirstName = profileWithAddress.Profile.FirstName,

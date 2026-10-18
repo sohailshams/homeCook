@@ -4,8 +4,8 @@ namespace HomeCook.Api.Services
 {
     public interface IUserProfileService
     {
-        public Task<UserProfileDTO?> GetUserProfileAsync(Guid userId);
-        public Task<UserProfileDTO> AddUserProfileAsync(AddUpdateProfileDTO addUpdateProfileDTO);
-        public Task<UserProfileDTO?> UpdateUserProfileAsync(AddUpdateProfileDTO updateProfile);
+        public Task<UserProfileDto?> GetUserProfileAsync(Guid userId);
+        public Task<UserProfileDto> AddUserProfileAsync(AddUpdateProfileDto addUpdateProfileDto);
+        public Task<UserProfileDto?> UpdateUserProfileAsync(AddUpdateProfileDto updateProfile);
     }
 }

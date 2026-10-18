@@ -27,34 +27,34 @@ namespace HomeCook.Api.Services
             _userAddressRepository = userAddressRepository;
         }
 
-        public async Task<AddressRequestDTO> AddAddressAsync(AddressRequestDTO addressRequestDTO)
+        public async Task<AddressRequestDto> AddAddressAsync(AddressRequestDto addressRequestDto)
         {
             try
             {
                 var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
                 var loggedInUserId = Guid.Parse(loggedInUserIdString);
-                if (loggedInUserId != addressRequestDTO.UserId)
+                if (loggedInUserId != addressRequestDto.UserId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized to add address in database.");
                 }
 
-                var user = await _userRepository.GetUserByIdAsync(addressRequestDTO.UserId) ?? throw new NotFoundException($"User with ID {addressRequestDTO.UserId} not found.");
+                var user = await _userRepository.GetUserByIdAsync(addressRequestDto.UserId) ?? throw new NotFoundException($"User with ID {addressRequestDto.UserId} not found.");
 
-                // Create Address model from AddressRequestDTO
+                // Create Address model from AddressRequestDto
                 var addressModel = new Address
                 {
-                    City = addressRequestDTO.City,
-                    Country = addressRequestDTO.Country,
-                    IsPrimary = addressRequestDTO.IsPrimary,
-                    AddressLine1 = addressRequestDTO.AddressLine1,
-                    PostCode = addressRequestDTO.PostCode,
+                    City = addressRequestDto.City,
+                    Country = addressRequestDto.Country,
+                    IsPrimary = addressRequestDto.IsPrimary,
+                    AddressLine1 = addressRequestDto.AddressLine1,
+                    PostCode = addressRequestDto.PostCode,
                     User = user,
-                    UserId = addressRequestDTO.UserId
+                    UserId = addressRequestDto.UserId
                 };
 
                 var userAddress = await _userAddressRepository.AddUserAddressAsync(addressModel);
 
-                var addressResponseDTO = new AddressRequestDTO
+                var addressResponseDto = new AddressRequestDto
                 {
                     UserId = userAddress.UserId,
                     City = userAddress.City,
@@ -64,7 +64,7 @@ namespace HomeCook.Api.Services
                     PostCode = userAddress.PostCode
                 };
 
-                return addressResponseDTO;
+                return addressResponseDto;
             }
             catch (DbUpdateException exception)
             {

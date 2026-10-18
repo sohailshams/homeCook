@@ -1,6 +1,6 @@
 ﻿namespace HomeCook.Api.DTOs
 {
-    public class FoodImageDTO
+    public class FoodImageDto
     {
         public string ImageUrl { get; set; }
         public string PublicId { get; set; }

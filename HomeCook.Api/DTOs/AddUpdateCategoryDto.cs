@@ -1,6 +1,6 @@
 ﻿namespace HomeCook.Api.DTOs
 {
-    public class AddUpdateCategoryDTO
+    public class AddUpdateCategoryDto
     {
         public string Name { get; set; }
     }

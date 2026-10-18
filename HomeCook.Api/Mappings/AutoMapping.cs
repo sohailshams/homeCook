@@ -7,25 +7,27 @@ namespace HomeCook.Api.Mappings
     {
         public AutoMapping()
         {
-            CreateMap<Category, CategoryDTO>().ReverseMap();
+            CreateMap<Category, CategoryDto>().ReverseMap();
 
-            CreateMap<AddUpdateCategoryDTO, Category>().ReverseMap();
+            CreateMap<AddUpdateCategoryDto, Category>().ReverseMap();
 
-            CreateMap<Food, FoodDTO>().ReverseMap();
+            CreateMap<Food, FoodDto>().ReverseMap();
 
-            CreateMap<FoodImage, FoodImageDTO>().ReverseMap();
+            CreateMap<FoodImage, FoodImageDto>().ReverseMap();
 
-            CreateMap<AddUpdateFoodDTO, Food>().ReverseMap();
+            CreateMap<CreateFoodDto, Food>();
 
-            CreateMap<Food, FoodDetailDTO>().ReverseMap();
+            CreateMap<UpdateFoodDto, Food>();
 
-            CreateMap<User, UserInfoDTO>().ReverseMap();
+            CreateMap<Food, FoodDetailDto>().ReverseMap();
 
-            CreateMap<Profile, UserProfileDTO>().ReverseMap();
+            CreateMap<User, UserInfoDto>().ReverseMap();
 
-            CreateMap<AddUpdateProfileDTO, Profile>().ReverseMap();
+            CreateMap<Profile, UserProfileDto>().ReverseMap();
 
-            CreateMap<Profile, AddUpdateProfileDTO>().ReverseMap();
+            CreateMap<AddUpdateProfileDto, Profile>().ReverseMap();
+
+            CreateMap<Profile, AddUpdateProfileDto>().ReverseMap();
         }
     }
 }

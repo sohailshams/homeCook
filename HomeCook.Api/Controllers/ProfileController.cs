@@ -30,7 +30,7 @@ namespace HomeCook.Api.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddUserPforile([FromBody] AddUpdateProfileDTO addUserProfile)
+        public async Task<IActionResult> AddUserPforile([FromBody] AddUpdateProfileDto addUserProfile)
         {
             var newUserProfile = await _userProfileService.AddUserProfileAsync(addUserProfile);
             return Ok(newUserProfile);
@@ -39,7 +39,7 @@ namespace HomeCook.Api.Controllers
         [HttpPut]
         [Authorize]
         [Route("update-profile")]
-        public async Task<IActionResult> UpdateUserProfile([FromBody] AddUpdateProfileDTO updateUserProfile)
+        public async Task<IActionResult> UpdateUserProfile([FromBody] AddUpdateProfileDto updateUserProfile)
         {
             var userProfile = await _userProfileService.UpdateUserProfileAsync(updateUserProfile);
             return Ok(userProfile);
