@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using HomeCook.Api.Models;
 
-namespace HomeCook.Api.DTOs
+namespace HomeCook.Api.Dtos
 {
     public class PostcodeResponseDto
     {

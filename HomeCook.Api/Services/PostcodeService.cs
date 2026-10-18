@@ -1,5 +1,5 @@
 ﻿
-using HomeCook.Api.DTOs;
+using HomeCook.Api.Dtos;
 using HomeCook.Api.Exceptions;
 using NetTopologySuite.Geometries;
 using SendGrid;

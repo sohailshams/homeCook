@@ -1,5 +1,5 @@
 using HomeCook.Api.Constants;
-using HomeCook.Api.DTOs;
+using HomeCook.Api.Dtos;
 using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

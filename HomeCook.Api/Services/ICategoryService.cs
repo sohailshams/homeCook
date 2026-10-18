@@ -1,4 +1,4 @@
-using HomeCook.Api.DTOs;
+using HomeCook.Api.Dtos;
 
 namespace HomeCook.Api.Services
 {

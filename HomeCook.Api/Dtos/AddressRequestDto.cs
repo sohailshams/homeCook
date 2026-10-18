@@ -1,6 +1,6 @@
 ﻿using HomeCook.Api.Models;
 
-namespace HomeCook.Api.DTOs
+namespace HomeCook.Api.Dtos
 {
     public class AddressRequestDto
     {

@@ -1,4 +1,4 @@
-﻿using HomeCook.Api.DTOs;
+﻿using HomeCook.Api.Dtos;
 using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 

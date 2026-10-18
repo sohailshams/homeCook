@@ -1,4 +1,4 @@
-﻿namespace HomeCook.Api.DTOs
+﻿namespace HomeCook.Api.Dtos
 {
     public class AddUpdateCategoryDto
     {

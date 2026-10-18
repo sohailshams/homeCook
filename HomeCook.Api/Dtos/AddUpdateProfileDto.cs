@@ -1,13 +1,11 @@
 ﻿using HomeCook.Api.Models;
 
-namespace HomeCook.Api.DTOs
+namespace HomeCook.Api.Dtos
 {
-    public class UserProfileDto
+    public class AddUpdateProfileDto
     {
-        public Guid ProfileId { get; set; }
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
-        public required string AddressLine1 { get; set; }
         public required string PhoneNumber { get; set; }
         public required string City { get; set; }
         public required string Country { get; set; }
@@ -16,5 +14,6 @@ namespace HomeCook.Api.DTOs
         public string? ProfileImage { get; set; }
         public required Guid UserId { get; set; }
         public bool IsPrimary { get; set; }
+        public string AddressLine1 { get; set; }
     }
 }

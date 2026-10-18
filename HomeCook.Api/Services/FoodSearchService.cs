@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 using AutoMapper;
-using HomeCook.Api.DTOs;
+using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
