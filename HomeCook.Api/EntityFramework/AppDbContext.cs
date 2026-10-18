@@ -54,6 +54,16 @@ namespace HomeCook.Api.EntityFramework
                 .HasIndex(a => a.UserId)
                 .HasFilter("\"IsPrimary\" = true")
                 .IsUnique();
+
+            // One order per Stripe payment, so duplicate webhooks can't create a second order
+            modelBuilder.Entity<Order>()
+                .HasIndex(o => o.StripePaymentIntentId)
+                .IsUnique();
+
+            // Store status as readable text ("Paid") instead of a number
+            modelBuilder.Entity<Order>()
+                .Property(o => o.Status)
+                .HasConversion<string>();
         }
     }
 }
