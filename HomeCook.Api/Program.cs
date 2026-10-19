@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using HomeCook.Api.EntityFramework;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Services;
-using HomeCook.Api.Mappings;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.AspNetCore.Identity;
@@ -117,7 +116,6 @@ builder.Services.AddScoped<IFoodSearchRepository, FoodSearchRepositoy>();
 builder.Services.AddScoped<IUserAddressRepository, UserAddressRepository>();
 builder.Services.AddScoped<IUserAddressService, UserAddressService>();
 
-builder.Services.AddAutoMapper(typeof(AutoMapping));
 
 var app = builder.Build();
 

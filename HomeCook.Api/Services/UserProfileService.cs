@@ -1,6 +1,4 @@
-﻿
-using AutoMapper;
-using HomeCook.Api.Dtos;
+﻿using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
@@ -12,21 +10,18 @@ namespace HomeCook.Api.Services
 {
     public class UserProfileService : IUserProfileService
     {
-        private readonly IMapper _mapper;
         private readonly IUserProfileRepository _userProfileRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
         private readonly IPostcodeService _postcodeService;
 
-        public UserProfileService(IMapper mapper,
-            IUserProfileRepository userProfileRepository,
+        public UserProfileService(IUserProfileRepository userProfileRepository,
             IHttpContextAccessor httpContextAccessor,
             IUserRepository userRepository,
             IUserAddressRepository userAddressRepository,
             IPostcodeService postcodeService)
         {
-            _mapper = mapper;
             _userProfileRepository = userProfileRepository;
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;

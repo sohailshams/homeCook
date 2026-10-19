@@ -1,6 +1,4 @@
-﻿
-using AutoMapper;
-using HomeCook.Api.Dtos;
+﻿using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
@@ -11,17 +9,14 @@ namespace HomeCook.Api.Services
 {
     public class UserAddressService : IUserAddressService
     {
-        private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
 
-        public UserAddressService(IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,
+        public UserAddressService(IHttpContextAccessor httpContextAccessor,
             IUserRepository userRepository,
             IUserAddressRepository userAddressRepository)
         {
-            _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;

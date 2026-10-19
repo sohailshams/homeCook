@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using HomeCook.Api.Mappings;
 using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
@@ -11,12 +11,10 @@ namespace HomeCook.Api.Services
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryReposity _categoriesReposity;
-        private readonly IMapper _mapper;
 
-        public CategoryService(ICategoryReposity categoriesReposity, IMapper mapper)
+        public CategoryService(ICategoryReposity categoriesReposity)
         {
             _categoriesReposity = categoriesReposity;
-            _mapper = mapper;
         }
 
         public async Task<List<CategoryDto>> GetCategoriesAsync()
@@ -25,7 +23,7 @@ namespace HomeCook.Api.Services
             var categories = await _categoriesReposity.GetCategoriesAsync();
 
             // map categories<Category> to categories<CategoryDto>
-            var categoriesDto = _mapper.Map<List<CategoryDto>>(categories);
+            var categoriesDto = categories.Select(category => category.ToDto()).ToList();
             return categoriesDto;
         }
 
@@ -34,13 +32,13 @@ namespace HomeCook.Api.Services
             try
             {
             // Convert AddCategoryDto to model
-            var categoryModel = _mapper.Map<Category>(addCategory);
+            var categoryModel = addCategory.ToModel();
 
             // Use model to create category in DB
             var newCategory = await _categoriesReposity.AddCategoryAsync(categoryModel) ??  throw new ValidationException("Category with same name already exist."); ;
             
             //Map model to DTO
-            var categoryDto = _mapper.Map<CategoryDto>(newCategory);
+            var categoryDto = newCategory.ToDto();
 
             return categoryDto;
 
@@ -57,11 +55,11 @@ namespace HomeCook.Api.Services
             try
             {
                 // Convert AddCategoryDto to model
-                var categoryModel = _mapper.Map<Category>(updateCategory);
+                var categoryModel = updateCategory.ToModel();
                 var category = await _categoriesReposity.UpdateCategoryAsync(categoryId, categoryModel) ?? throw new ValidationException("Category not found.");
 
                 //Map model to DTO
-                var categoryDto = _mapper.Map<CategoryDto>(category);
+                var categoryDto = category.ToDto();
                 return categoryDto;
 
             }
@@ -79,7 +77,7 @@ namespace HomeCook.Api.Services
                 var category = await _categoriesReposity.DeleteCategoryAsync(categoryId) ?? throw new NotFoundException("Category not found.");
 
                 //Map model to DTO
-                var categoryDto = _mapper.Map<CategoryDto>(category);
+                var categoryDto = category.ToDto();
                 return categoryDto;
 
             } catch(DbUpdateException exception)

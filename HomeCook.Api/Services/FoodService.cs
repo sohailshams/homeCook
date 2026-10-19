@@ -1,13 +1,10 @@
-﻿using AutoMapper;
+﻿using HomeCook.Api.Mappings;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
-using HomeCook.Api.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -16,7 +13,6 @@ namespace HomeCook.Api.Services
     public class FoodService : IFoodService
     {
         private readonly IFoodRepository _foodRepository;
-        private readonly IMapper _mapper;
         public readonly ICategoryService _categoryService;
         public readonly IUserRepository _userRepository;
         private readonly ICategoryReposity _categoryReposity;
@@ -26,7 +22,6 @@ namespace HomeCook.Api.Services
         private readonly IPostcodeService _postcodeService;
 
         public FoodService(IFoodRepository foodRepository,
-                            IMapper mapper,
                             ICategoryService categoryService,
                             IUserRepository userRepository,
                             ICategoryReposity categoryReposity,
@@ -36,7 +31,6 @@ namespace HomeCook.Api.Services
                             IPostcodeService postcodeService)
         {
             _foodRepository = foodRepository;
-            _mapper = mapper;
             _categoryService = categoryService;
             _userRepository = userRepository;
             _categoryReposity = categoryReposity;
@@ -48,13 +42,11 @@ namespace HomeCook.Api.Services
 
         public async Task<List<FoodDto>> GetFoodListAsync(string postCode, double? radius)
         {
-            // get food list from db
             var location = await _postcodeService.GetLocationAsync(postCode);
-
             var food = await _foodRepository.GetFoodListAsync(location, radius);
 
             // map food list<Food> to food list<FoodDto>
-            var foodDto = _mapper.Map<List<FoodDto>>(food);
+            var foodDto = food.Select(f => f.ToDto()).ToList();
             return foodDto;
         }
 
@@ -64,7 +56,7 @@ namespace HomeCook.Api.Services
             {
                 var food = await _foodRepository.GetFoodDetailAsync(id) ?? throw new NotFoundException("Food not found.");
                 // map Food model to FoodDetailDto
-                var foodDetailDto = _mapper.Map<FoodDetailDto>(food);
+                var foodDetailDto = food.ToDetailDto();
                 return foodDetailDto;
 
             }
@@ -77,13 +69,12 @@ namespace HomeCook.Api.Services
 
         public async Task<List<FoodDto>> GetFoodByCategoryIdAsync(Guid categoryId)
         {
-            // get food list from db
             var food = await _foodRepository.GetFoodByCategoryIdAsync(categoryId);
 
             // map food list<Food> to food list<FoodDto>
             if (food.Count > 0)
             {
-                var foodDto = _mapper.Map<List<FoodDto>>(food);
+                var foodDto = food.Select(f => f.ToDto()).ToList();
                 return foodDto;
             }
             return [];
@@ -100,11 +91,8 @@ namespace HomeCook.Api.Services
                     throw new UnauthorizedAccessException("Unauthorized user.");
                 }
 
-                // Convert addFoodDto to model
-                var foodModel = _mapper.Map<Food>(addFoodDto);
-
-                // The seller is always the logged-in user, never a value from the request
-                foodModel.SellerId = parsedLoggedInUserId;
+                // Convert addFoodDto to model - the seller is always the logged-in user
+                var foodModel = addFoodDto.ToModel(parsedLoggedInUserId);
 
                 var category = await _categoryReposity.GetCategoryByIdAsync(foodModel.CategoryId) ?? throw new NotFoundException($"Category with ID {addFoodDto.CategoryId} not found.");
                 foodModel.Category = category;
@@ -126,8 +114,8 @@ namespace HomeCook.Api.Services
                 // Update draft tag to food
                 await MarkTagAsFoodAsync(imagePublicIds);
 
-                //Map model to FoodDto
-                var foodDto = _mapper.Map<FoodDto>(newFood);
+                // Map model to FoodDto
+                var foodDto = newFood.ToDto();
 
                 return foodDto;
 
@@ -144,34 +132,28 @@ namespace HomeCook.Api.Services
             {
                 var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
 
-                // Convert UpdateFoodDto to model
-                var updateFoodModal = _mapper.Map<Food>(foodUpdate);
-                var existingFood = await GetFoodDetailAsync(foodId);
-                if (existingFood == null) throw new NotFoundException("Food not found.");
+                var existingFood = await _foodRepository.GetFoodDetailAsync(foodId) ?? throw new NotFoundException("Food not found.");
 
                 if (existingFood.SellerId.ToString() != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
 
-                existingFood.Name = updateFoodModal.Name;
-                existingFood.Description = updateFoodModal.Description;
-                existingFood.AvailableDate = updateFoodModal.AvailableDate;
-                existingFood.QuantityAvailable = updateFoodModal.QuantityAvailable;
-                existingFood.Price = updateFoodModal.Price;
-                existingFood.CategoryId = updateFoodModal.CategoryId;
-                existingFood.Ingredients = updateFoodModal.Ingredients;
-                if (updateFoodModal.FoodImages != null && updateFoodModal.FoodImages.Count > 0)
+                existingFood.Name = foodUpdate.Name;
+                existingFood.Description = foodUpdate.Description;
+                existingFood.Ingredients = foodUpdate.Ingredients.ToList();
+                existingFood.Price = foodUpdate.Price;
+                existingFood.QuantityAvailable = foodUpdate.QuantityAvailable;
+                existingFood.AvailableDate = foodUpdate.AvailableDate;
+                existingFood.CategoryId = foodUpdate.CategoryId;
+
+                // No images in the request keeps the existing ones
+                if (foodUpdate.FoodImages != null && foodUpdate.FoodImages.Count > 0)
                 {
-                    existingFood.FoodImages = updateFoodModal.FoodImages.Select(image => new FoodImageDto
-                    {
-                        ImageUrl = image.ImageUrl,
-                        PublicId = image.PublicId
-                    }).ToList();
+                    existingFood.FoodImages = foodUpdate.FoodImages.Select(image => image.ToModel()).ToList();
                 }
 
-                var existingFoodModel = _mapper.Map<Food>(existingFood);
-                var updatedFood = await _foodRepository.UpdateFoodAsync(existingFoodModel);
+                var updatedFood = await _foodRepository.UpdateFoodAsync(existingFood);
 
                 // Convert Food model to FoodDto
-                var updatedFoodDto = _mapper.Map<FoodDto>(updatedFood);
+                var updatedFoodDto = updatedFood!.ToDto();
 
                 return updatedFoodDto;
             }
@@ -189,7 +171,7 @@ namespace HomeCook.Api.Services
 
                 var food = await _foodRepository.DeleteFoodByIdAsync(foodId, loggedInUserId) ?? throw new NotFoundException("Food not found.");
                 // Map Food model to FoodDto
-                var foodDto = _mapper.Map<FoodDto>(food);
+                var foodDto = food.ToDto();
                 return foodDto;
             }
             catch (DbUpdateException exception)

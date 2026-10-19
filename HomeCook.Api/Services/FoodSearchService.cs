@@ -1,5 +1,5 @@
 using System.Text.RegularExpressions;
-using AutoMapper;
+using HomeCook.Api.Mappings;
 using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
@@ -11,12 +11,10 @@ namespace HomeCook.Api.Services;
 public class FoodSearchService : IFoodSearchService
 {
     private readonly IFoodSearchRepository _foodSearchRepository;
-    private readonly IMapper _mapper;
 
-    public FoodSearchService(IFoodSearchRepository foodSearchRepository, IMapper mapper)
+    public FoodSearchService(IFoodSearchRepository foodSearchRepository)
     {
         _foodSearchRepository = foodSearchRepository;
-        _mapper = mapper;
     }
     public async Task<List<FoodDto>> FoodSearchAsync(string foodSearchTerm)
     {
@@ -37,7 +35,7 @@ public class FoodSearchService : IFoodSearchService
             // map food list<Food> to food list<FoodDto>
             if (foodList != null && foodList.Count > 0)
             {
-                var foodDto = _mapper.Map<List<FoodDto>>(foodList);
+                var foodDto = foodList.Select(f => f.ToDto()).ToList();
                 return foodDto;
             }
             return new List<FoodDto>();

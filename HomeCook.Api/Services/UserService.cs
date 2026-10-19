@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using HomeCook.Api.Mappings;
 using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
@@ -12,14 +12,12 @@ namespace HomeCook.Api.Services
     public class UserService : IUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMapper _mapper;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
         private readonly UserManager<User> _userManager;
 
-        public UserService(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUserRepository userRepository, IUserAddressRepository userAddressRepository, UserManager<User> userManager)
+        public UserService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IUserAddressRepository userAddressRepository, UserManager<User> userManager)
         {
-            _mapper = mapper;
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;
             _httpContextAccessor = httpContextAccessor;
@@ -67,7 +65,7 @@ namespace HomeCook.Api.Services
                 var user = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException("User not found.");
 
                 // Map user model to UserInfoDto
-                var userInfoDto = _mapper.Map<UserInfoDto>(user);
+                var userInfoDto = user.ToInfoDto();
                 userInfoDto.Roles = (await _userManager.GetRolesAsync(user)).ToList();
 
                 return userInfoDto;
