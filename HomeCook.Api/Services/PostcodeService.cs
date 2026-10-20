@@ -1,9 +1,8 @@
 ﻿
 using HomeCook.Api.Dtos;
-using HomeCook.Api.Exceptions;
 using NetTopologySuite.Geometries;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace HomeCook.Api.Services
 {
@@ -19,10 +18,17 @@ namespace HomeCook.Api.Services
         {
             var cleaned = postcode.Replace(" ", "");
 
-            var response = await _httpClient.GetFromJsonAsync<PostcodeResponseDto>($"postcodes/{cleaned}");
+            using var httpResponse = await _httpClient.GetAsync($"postcodes/{Uri.EscapeDataString(cleaned)}");
 
-            if (response?.Status != 200 || response.Result == null)
-                throw new NotFoundException($"Could not find coordinates for postcode {postcode}.");
+            if (httpResponse.StatusCode == HttpStatusCode.NotFound)
+                throw new ValidationException($"Invalid postcode: {postcode}.");
+
+            httpResponse.EnsureSuccessStatusCode();
+
+            var response = await httpResponse.Content.ReadFromJsonAsync<PostcodeResponseDto>();
+
+            if (response?.Result == null)
+                throw new ValidationException($"Could not find coordinates for postcode {postcode}.");
 
             return new Point(response.Result.Longitude, response.Result.Latitude)
             {
