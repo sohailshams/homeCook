@@ -1,4 +1,5 @@
-﻿using HomeCook.Api.Dtos;
+﻿using System.ComponentModel.DataAnnotations;
+using HomeCook.Api.Dtos;
 using HomeCook.Api.Models;
 using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -23,9 +24,9 @@ namespace HomeCook.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetFoodList([FromQuery] string postCode, [FromQuery] double? radius)
         {
-            if (string.IsNullOrWhiteSpace(postCode) && radius == null)
+            if (string.IsNullOrWhiteSpace(postCode) || radius == null)
             {
-                throw new InvalidOperationException($"PostCode and Radius are required.");
+                throw new ValidationException($"PostCode/Radius are required.");
             }
             var food = await _foodService.GetFoodListAsync(postCode, radius);
             return Ok(food);
