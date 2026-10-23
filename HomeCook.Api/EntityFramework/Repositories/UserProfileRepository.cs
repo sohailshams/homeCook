@@ -28,14 +28,14 @@ namespace HomeCook.Api.EntityFramework.Repositories
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == profile.UserId);
             if (user == null)
             {
-                throw new DatabaseOperationException($"User with ID {profile.UserId} not found.", new Exception());
+                throw new NotFoundException($"User with ID {profile.UserId} not found.");
             }
             user.IsProfileComplete = true;
 
             var existingProfile = await _dbContext.Profiles.FirstOrDefaultAsync(p => p.UserId == profile.UserId);
             if (existingProfile != null)
             {
-                throw new DatabaseOperationException($"A profile with {profile.UserId} already exists.", new Exception());
+                throw new EntityAlreadyExistsException($"A profile with {profile.UserId} already exists.");
             }
 
             await _dbContext.Profiles.AddAsync(profile);
