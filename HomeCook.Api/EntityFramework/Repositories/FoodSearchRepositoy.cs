@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using HomeCook.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,19 +16,29 @@ public class FoodSearchRepositoy : IFoodSearchRepository
     }
     public async Task<List<Food>> FoodSearchAsync(string foodSearchTerm)
     {
-        if (string.IsNullOrWhiteSpace(foodSearchTerm))
+        // Keep only words made of letters/digits "chicken curry!" - ["chicken", "curry"]
+        var words = Regex.Matches(foodSearchTerm ?? "", @"[\p{L}\p{N}]+")
+            .Select(m => m.Value)
+            .ToList();
+
+        // Blank or symbols only input - nothing to search for
+        if (words.Count == 0)
             return new List<Food>();
 
-        // PostgreSQL Full Text Search with EF.Functions
+        // Build a valid tsquery - ["chicken", "curry"] - "chicken:* & curry:*"
+        var tsQuery = string.Join(" & ", words.Select(w => w + ":*"));
+
+        // Text for the category ILIKE, also from the clean words - "chicken curry"
+        var categoryTerm = string.Join(" ", words);
+
         return await _dbContext.Foods
             .Include(f => f.Category)
-            .Include("FoodImages")
+            .Include(f => f.FoodImages)
             .Where(f =>
-                f.SearchVector.Matches(
-                    EF.Functions.ToTsQuery("english", $"{foodSearchTerm}:*")) ||
-                    EF.Functions.ILike(f.Category.Name, $"%{foodSearchTerm}%"))
-                .OrderByDescending(f => f.AvailableDate)
-                .ToListAsync();
+                f.SearchVector.Matches(EF.Functions.ToTsQuery("english", tsQuery)) ||
+                EF.Functions.ILike(f.Category.Name, $"%{categoryTerm}%"))
+            .OrderByDescending(f => f.AvailableDate)
+            .ToListAsync();
     }
 
     public async Task<List<Food>> FoodSearchPostCodeAsync(string foodSearchTerm)
