@@ -35,9 +35,9 @@ namespace HomeCook.Api.Exceptions
             // Handle exceptions based on their type
             switch (exception)
             {
-                case DatabaseOperationException dbEx:
+                case DatabaseOperationException ex:
                     statusCode = StatusCodes.Status500InternalServerError;
-                    errorMessage = dbEx.Message;
+                    errorMessage = ex.Message;
                     break;
 
                 case ValidationException dbEx:
@@ -52,6 +52,11 @@ namespace HomeCook.Api.Exceptions
 
                 case NotFoundException dbEx:
                     statusCode = StatusCodes.Status404NotFound;
+                    errorMessage = dbEx.Message;
+                    break;
+
+                case EntityAlreadyExistsException dbEx:
+                    statusCode = StatusCodes.Status409Conflict;
                     errorMessage = dbEx.Message;
                     break;
 
