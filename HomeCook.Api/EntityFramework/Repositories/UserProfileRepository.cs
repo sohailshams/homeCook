@@ -22,30 +22,6 @@ namespace HomeCook.Api.EntityFramework.Repositories
             return userProfile;
         }
 
-        public async Task<Profile?> UpdateUserProfileAsync(string loggedInUserId, Profile updateProfile)
-        {
-            var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == updateProfile.UserId) ?? throw new Exception($"User with ID {updateProfile.UserId} not found.");
-            var existingProfile = await GetUserProfileByIdAsync(updateProfile.UserId);
-            if (existingProfile == null) return null;
-            if (existingProfile.UserId.ToString() != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this profile information."); }
-            existingProfile.FirstName = updateProfile.FirstName;
-            existingProfile.LastName = updateProfile.LastName;
-            existingProfile.PhoneNumber = updateProfile.PhoneNumber;
-            existingProfile.User = user;
-            existingProfile.UserId = updateProfile.UserId;
-            if (updateProfile.ProfileImage != null)
-            {
-                existingProfile.ProfileImage = updateProfile.ProfileImage;
-            }
-            if (updateProfile.Bio != null)
-            {
-                existingProfile.Bio = updateProfile.Bio;
-            }
-
-            await _dbContext.SaveChangesAsync();
-            return existingProfile;
-        }
-
         public async Task<ProfileWithAddress> AddUserProfileAddressAsync(Profile profile, Address address)
         {
 

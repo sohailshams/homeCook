@@ -13,7 +13,6 @@ namespace HomeCook.Api.Dtos
         public string? Bio { get; set; }
         public string? ProfileImage { get; set; }
         public required Guid UserId { get; set; }
-        public bool IsPrimary { get; set; }
         public string AddressLine1 { get; set; }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using HomeCook.Api.Dtos;
 using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
-using HomeCook.Api.Models;
-using HomeCook.Api.Projections;
+using HomeCook.Api.Mappings;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -39,27 +38,10 @@ namespace HomeCook.Api.Services
                     throw new NotFoundException($"Profile with ID {userId} was not found.");
                 }
                 var address = await _userAddressRepository.GetUserAddressListByIdAsync(userId);
-                var primaryAddress = address.FirstOrDefault(a => a.IsPrimary);
-                if (primaryAddress == null)
-                {
-                    throw new NotFoundException($"Address with ID {userId} was not found.");
-                }
-                var userProfileDto = new UserProfileDto
-                {
-                    UserId = userProfileModel.UserId,
-                    FirstName = userProfileModel.FirstName,
-                    LastName = userProfileModel.LastName,
-                    PhoneNumber = userProfileModel.PhoneNumber,
-                    Bio = userProfileModel.Bio,
-                    ProfileImage = userProfileModel.ProfileImage,
-                    City = primaryAddress.City,
-                    Country = primaryAddress.Country,
-                    AddressLine1 = primaryAddress.AddressLine1,
-                    PostCode = primaryAddress.PostCode,
-                    IsPrimary = primaryAddress.IsPrimary
-                };
-                return userProfileDto;
+                var primaryAddress = address.FirstOrDefault(a => a.IsPrimary)
+                    ?? throw new NotFoundException($"Primary address for user {userId} was not found.");
 
+                return userProfileModel.ToDto(primaryAddress);
             }
             catch (Exception exception) when (exception is not NotFoundException)
             {
@@ -71,59 +53,21 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-                var loggedInUserId = Guid.Parse(loggedInUserIdString);
+                var loggedInUserId = GetLoggedInUserId();
                 if (loggedInUserId != addUpdateProfileDto.UserId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized to add profile information in database.");
                 }
 
-                var user = await _userRepository.GetUserByIdAsync(addUpdateProfileDto.UserId) ?? throw new NotFoundException($"User with ID {addUpdateProfileDto.UserId} not found.");
+                _ = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException($"User with ID {loggedInUserId} not found.");
 
-                // Create Address model from AddUpdateProfileDto
-                var addressModel = new Address
-                {
-                    City = addUpdateProfileDto.City,
-                    Country = addUpdateProfileDto.Country,
-                    IsPrimary = true,
-                    AddressLine1 = addUpdateProfileDto.AddressLine1,
-                    PostCode = addUpdateProfileDto.PostCode,
-                    User = user,
-                    UserId = addUpdateProfileDto.UserId,
-                    Location = await _postcodeService.GetLocationAsync(addUpdateProfileDto.PostCode)
-                };
-
-                // Create Profile model from AddUpdateProfileDto
-                var profileModel = new HomeCook.Api.Models.Profile
-                {
-                    UserId = addUpdateProfileDto.UserId,
-                    FirstName = addUpdateProfileDto.FirstName,
-                    LastName = addUpdateProfileDto.LastName,
-                    PhoneNumber = addUpdateProfileDto.PhoneNumber,
-                    User = user,
-                    Bio = addUpdateProfileDto.Bio,
-                    ProfileImage = addUpdateProfileDto.ProfileImage
-                };
+                var location = await _postcodeService.GetLocationAsync(addUpdateProfileDto.PostCode);
+                var addressModel = addUpdateProfileDto.ToAddressModel(loggedInUserId, location);
+                var profileModel = addUpdateProfileDto.ToProfileModel(loggedInUserId);
 
                 var profileWithAddress = await _userProfileRepository.AddUserProfileAddressAsync(profileModel, addressModel);
 
-
-                var userProfileDto = new UserProfileDto
-                {
-                    UserId = profileWithAddress.Profile.UserId,
-                    FirstName = profileWithAddress.Profile.FirstName,
-                    LastName = profileWithAddress.Profile.LastName,
-                    PhoneNumber = profileWithAddress.Profile.PhoneNumber,
-                    Bio = profileWithAddress.Profile.Bio,
-                    ProfileImage = profileWithAddress.Profile.ProfileImage,
-                    City = profileWithAddress.Address.City,
-                    Country = profileWithAddress.Address.Country,
-                    AddressLine1 = profileWithAddress.Address.AddressLine1,
-                    PostCode = profileWithAddress.Address.PostCode,
-                    IsPrimary = profileWithAddress.Address.IsPrimary
-                };
-
-                return userProfileDto;
+                return profileWithAddress.Profile.ToDto(profileWithAddress.Address);
             }
             catch (DbUpdateException exception)
             {
@@ -135,67 +79,51 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-                var loggedInUserId = Guid.Parse(loggedInUserIdString);
+                var loggedInUserId = GetLoggedInUserId();
                 if (loggedInUserId != updateProfile.UserId)
                 {
                     throw new UnauthorizedAccessException("You are not authorized to update profile information in database.");
                 }
 
-                var existingProfile = await _userProfileRepository.GetUserProfileByIdAsync(updateProfile.UserId);
-                if (existingProfile == null)
-                {
-                    throw new NotFoundException($"Profile with ID {updateProfile.UserId} was not found.");
-                }
+                var existingProfile = await _userProfileRepository.GetUserProfileByIdAsync(loggedInUserId)
+                    ?? throw new NotFoundException($"Profile with ID {loggedInUserId} was not found.");
 
-                var addressList = await _userAddressRepository.GetUserAddressListByIdAsync(updateProfile.UserId);
-                var primaryAddress = addressList.FirstOrDefault(a => a.IsPrimary);
+                var addressList = await _userAddressRepository.GetUserAddressListByIdAsync(loggedInUserId);
+                var primaryAddress = addressList.FirstOrDefault(a => a.IsPrimary)
+                    ?? throw new NotFoundException($"Primary address for user {loggedInUserId} was not found.");
 
-                var user = await _userRepository.GetUserByIdAsync(updateProfile.UserId) ?? throw new NotFoundException($"User with ID {updateProfile.UserId} not found.");
-
-                // update Address model
+                // Copy only the fields a user may change - ids and ownership stay as they are
+                primaryAddress.AddressLine1 = updateProfile.AddressLine1;
                 primaryAddress.City = updateProfile.City;
                 primaryAddress.Country = updateProfile.Country;
-                primaryAddress.IsPrimary = true;
-                primaryAddress.AddressLine1 = updateProfile.AddressLine1;
                 primaryAddress.PostCode = updateProfile.PostCode;
-                primaryAddress.User = user;
-                primaryAddress.UserId = updateProfile.UserId;
+                primaryAddress.IsPrimary = true;
                 primaryAddress.Location = await _postcodeService.GetLocationAsync(updateProfile.PostCode);
 
-                // update Profile model
-                existingProfile.UserId = updateProfile.UserId;
                 existingProfile.FirstName = updateProfile.FirstName;
                 existingProfile.LastName = updateProfile.LastName;
                 existingProfile.PhoneNumber = updateProfile.PhoneNumber;
-                existingProfile.User = user;
                 existingProfile.Bio = updateProfile.Bio;
                 existingProfile.ProfileImage = updateProfile.ProfileImage;
 
                 var profileWithAddress = await _userProfileRepository.UpdateUserProfileAddressAsync(existingProfile, primaryAddress);
 
-
-                var userProfileDto = new UserProfileDto
-                {
-                    UserId = profileWithAddress.Profile.UserId,
-                    FirstName = profileWithAddress.Profile.FirstName,
-                    LastName = profileWithAddress.Profile.LastName,
-                    PhoneNumber = profileWithAddress.Profile.PhoneNumber,
-                    Bio = profileWithAddress.Profile.Bio,
-                    ProfileImage = profileWithAddress.Profile.ProfileImage,
-                    City = profileWithAddress.Address.City,
-                    Country = profileWithAddress.Address.Country,
-                    AddressLine1 = profileWithAddress.Address.AddressLine1,
-                    PostCode = profileWithAddress.Address.PostCode,
-                    IsPrimary = profileWithAddress.Address.IsPrimary
-                };
-
-                return userProfileDto;
+                return profileWithAddress.Profile.ToDto(profileWithAddress.Address);
             }
             catch (DbUpdateException exception)
             {
                 throw new DatabaseOperationException("Failed to update profile information.", exception);
             }
+        }
+
+        private Guid GetLoggedInUserId()
+        {
+            var loggedInUserIdString = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!Guid.TryParse(loggedInUserIdString, out var loggedInUserId))
+            {
+                throw new UnauthorizedAccessException("Unauthorized user.");
+            }
+            return loggedInUserId;
         }
     }
 }
