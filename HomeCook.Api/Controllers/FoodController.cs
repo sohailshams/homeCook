@@ -24,9 +24,9 @@ namespace HomeCook.Api.Controllers
         [Authorize]
         public async Task<IActionResult> GetFoodList([FromQuery] string postCode, [FromQuery] double? radius)
         {
-            if (string.IsNullOrWhiteSpace(postCode) || radius == null)
+            if (string.IsNullOrWhiteSpace(postCode))
             {
-                throw new ValidationException($"PostCode/Radius are required.");
+                throw new ValidationException($"PostCode is required.");
             }
             var food = await _foodService.GetFoodListAsync(postCode, radius);
             return Ok(food);
