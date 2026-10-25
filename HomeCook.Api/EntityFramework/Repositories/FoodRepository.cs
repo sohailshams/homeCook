@@ -73,7 +73,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<Food?> UpdateFoodAsync(Food updateFood)
         {
-            dbContext.Update(updateFood);
+            // updateFood was loaded by this DbContext, so EF already tracks it and saves only what changed
             await dbContext.SaveChangesAsync();
             return updateFood;
         }
