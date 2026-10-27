@@ -14,9 +14,11 @@ namespace HomeCook.Api.Dtos
         // 0 is allowed so a seller can mark the food as sold out
         [Range(0, int.MaxValue, ErrorMessage = "Quantity cannot be negative.")]
         public int QuantityAvailable { get; set; }
-        public DateTime AvailableDate { get; set; }
+        [Required(ErrorMessage = "Available date is required.")]
+        public DateTime? AvailableDate { get; set; }
+        [Required(ErrorMessage = "Order deadline is required.")]
+        public DateTime? OrderDeadline { get; set; }
         public Guid CategoryId { get; set; }
-        // Null or empty keeps the existing images
         public List<FoodImageDto>? FoodImages { get; set; }
     }
 }

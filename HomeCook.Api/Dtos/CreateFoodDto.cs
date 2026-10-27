@@ -13,7 +13,10 @@ namespace HomeCook.Api.Dtos
         public decimal Price { get; set; }
         [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
         public int QuantityAvailable { get; set; }
-        public DateTime AvailableDate { get; set; }
+        [Required(ErrorMessage = "Available date is required.")]
+        public DateTime? AvailableDate { get; set; }
+        [Required(ErrorMessage = "Order deadline is required.")]
+        public DateTime? OrderDeadline { get; set; }
         public Guid CategoryId { get; set; }
         [Required]
         [MinLength(1, ErrorMessage = "At least one food image is required.")]

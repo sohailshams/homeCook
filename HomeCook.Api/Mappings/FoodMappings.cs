@@ -9,6 +9,7 @@ namespace HomeCook.Api.Mappings
         {
             Id = food.Id,
             AvailableDate = food.AvailableDate,
+            OrderDeadline = food.OrderDeadline,
             Name = food.Name,
             Price = food.Price,
             Description = food.Description,
@@ -27,6 +28,7 @@ namespace HomeCook.Api.Mappings
             Description = food.Description,
             Price = food.Price,
             AvailableDate = food.AvailableDate,
+            OrderDeadline = food.OrderDeadline,
             QuantityAvailable = food.QuantityAvailable,
             Ingredients = food.Ingredients,
             SellerId = food.SellerId,
@@ -43,7 +45,9 @@ namespace HomeCook.Api.Mappings
             Ingredients = dto.Ingredients.ToList(),
             Price = dto.Price,
             QuantityAvailable = dto.QuantityAvailable,
-            AvailableDate = dto.AvailableDate,
+            // [Required] on the DTO guarantees both dates are present
+            AvailableDate = dto.AvailableDate!.Value,
+            OrderDeadline = dto.OrderDeadline!.Value,
             CategoryId = dto.CategoryId,
             SellerId = sellerId,
             FoodImages = dto.FoodImages.Select(image => image.ToModel()).ToList()

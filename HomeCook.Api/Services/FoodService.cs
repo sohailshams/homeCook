@@ -18,7 +18,6 @@ namespace HomeCook.Api.Services
         private readonly ICategoryReposity _categoryReposity;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Cloudinary _cloudinary;
-        private readonly IUserProfileService _userProfileService;
         private readonly IPostcodeService _postcodeService;
 
         public FoodService(IFoodRepository foodRepository,
@@ -27,7 +26,6 @@ namespace HomeCook.Api.Services
                             ICategoryReposity categoryReposity,
                             IHttpContextAccessor httpContextAccessor,
                             Cloudinary cloudinary,
-                            IUserProfileService userProfileService,
                             IPostcodeService postcodeService)
         {
             _foodRepository = foodRepository;
@@ -36,7 +34,6 @@ namespace HomeCook.Api.Services
             _categoryReposity = categoryReposity;
             _httpContextAccessor = httpContextAccessor;
             _cloudinary = cloudinary;
-            _userProfileService = userProfileService;
             _postcodeService = postcodeService;
         }
 
@@ -93,19 +90,21 @@ namespace HomeCook.Api.Services
 
                 // Convert addFoodDto to model - the seller is always the logged-in user
                 var foodModel = addFoodDto.ToModel(parsedLoggedInUserId);
+                ValidateOrderDeadline(foodModel.AvailableDate, foodModel.OrderDeadline);
+                if (foodModel.OrderDeadline <= DateTime.UtcNow)
+                {
+                    throw new ValidationException("Order deadline must be in the future.");
+                }
 
                 var category = await _categoryReposity.GetCategoryByIdAsync(foodModel.CategoryId) ?? throw new NotFoundException($"Category with ID {addFoodDto.CategoryId} not found.");
                 foodModel.Category = category;
 
                 var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {parsedLoggedInUserId} not found.");
-                foodModel.Seller = seller;
-
-                var userProfile = await _userProfileService.GetUserProfileAsync(parsedLoggedInUserId);
-
-                if (userProfile == null)
+                if (seller.IsProfileComplete != true)
                 {
                     throw new ValidationException("User Profile must be completed before listing food.");
                 }
+                foodModel.Seller = seller;
 
                 // Use model to create food object in DB
                 var newFood = await _foodRepository.AddFoodAsync(foodModel);
@@ -141,7 +140,17 @@ namespace HomeCook.Api.Services
                 existingFood.Ingredients = foodUpdate.Ingredients.ToList();
                 existingFood.Price = foodUpdate.Price;
                 existingFood.QuantityAvailable = foodUpdate.QuantityAvailable;
-                existingFood.AvailableDate = foodUpdate.AvailableDate;
+                existingFood.AvailableDate = foodUpdate.AvailableDate!.Value;
+
+                // A deadline already in the past is fine if unchanged, so sellers can still edit closed food
+                var orderDeadline = foodUpdate.OrderDeadline!.Value;
+                ValidateOrderDeadline(existingFood.AvailableDate, orderDeadline);
+                if (orderDeadline != existingFood.OrderDeadline && orderDeadline <= DateTime.UtcNow)
+                {
+                    throw new ValidationException("Order deadline must be in the future.");
+                }
+                existingFood.OrderDeadline = orderDeadline;
+
                 existingFood.CategoryId = foodUpdate.CategoryId;
 
                 // No images in the request keeps the existing ones
@@ -177,6 +186,14 @@ namespace HomeCook.Api.Services
             catch (DbUpdateException exception)
             {
                 throw new DatabaseOperationException("Failed to delete food.", exception);
+            }
+        }
+
+        private static void ValidateOrderDeadline(DateTime availableDate, DateTime orderDeadline)
+        {
+            if (orderDeadline > availableDate)
+            {
+                throw new ValidationException("Order deadline cannot be after the available date.");
             }
         }
 

@@ -35,6 +35,9 @@ namespace HomeCook.Api.Controllers
 
             var food = await _foodService.GetFoodDetailAsync(itemData.FoodId);
 
+            if (food!.OrderDeadline <= DateTime.UtcNow)
+                throw new ValidationException("Ordering for this food has closed.");
+
             if (itemData.Quantity > food!.QuantityAvailable)
                 throw new ValidationException($"Only {food.QuantityAvailable} item(s) available.");
 

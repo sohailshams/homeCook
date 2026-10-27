@@ -25,15 +25,18 @@ namespace HomeCook.Api.EntityFramework.Repositories
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
-            // Single SQL UPDATE: checks and decrements stock atomically, so two buyers can't both take the last portion
+            // Single SQL UPDATE: checks stock and the order deadline and decrements stock atomically,
+            // so two buyers can't both take the last portion and nobody orders after the deadline
+            var now = DateTime.UtcNow;
             var rowsUpdated = await _dbContext.Foods
-                .Where(f => f.Id == foodId && f.QuantityAvailable >= quantity)
+                .Where(f => f.Id == foodId && f.QuantityAvailable >= quantity && f.OrderDeadline > now)
                 .ExecuteUpdateAsync(s => s.SetProperty(f => f.QuantityAvailable, f => f.QuantityAvailable - quantity));
 
             if (rowsUpdated == 0)
             {
                 await transaction.RollbackAsync();
-                return ReserveStockResult.OutOfStock;
+                var deadlinePassed = await _dbContext.Foods.AnyAsync(f => f.Id == foodId && f.OrderDeadline <= now);
+                return deadlinePassed ? ReserveStockResult.OrderingClosed : ReserveStockResult.OutOfStock;
             }
 
             try

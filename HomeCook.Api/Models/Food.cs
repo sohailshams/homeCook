@@ -7,6 +7,7 @@ namespace HomeCook.Api.Models
     {
         public Guid Id { get; set; }
         public DateTime AvailableDate { get; set; }
+        public DateTime OrderDeadline { get; set; }
         public required string Name { get; set; }
         [Precision(10, 2)]
         public decimal Price { get; set; }

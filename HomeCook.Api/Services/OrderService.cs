@@ -79,6 +79,12 @@ namespace HomeCook.Api.Services
                     await CancelPaymentIntentAsync(paymentIntent.Id);
                     return;
 
+                case ReserveStockResult.OrderingClosed:
+                    // Deadline passed between checkout and payment: release the hold, buyer is never charged
+                    _logger.LogWarning($"Order deadline for food {foodId} passed before payment {paymentIntent.Id} was authorized - cancelling payment.");
+                    await CancelPaymentIntentAsync(paymentIntent.Id);
+                    return;
+
                 case ReserveStockResult.Duplicate:
                     _logger.LogInformation($"Payment {paymentIntent.Id} is being handled by another webhook delivery - ignoring.");
                     return;

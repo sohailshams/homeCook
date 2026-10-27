@@ -32,6 +32,7 @@ public class FoodSearchRepositoy : IFoodSearchRepository
         var categoryTerm = string.Join(" ", words);
 
         return await _dbContext.Foods
+            .OpenForOrders()
             .Include(f => f.Category)
             .Include(f => f.FoodImages)
             .Where(f =>
@@ -48,6 +49,7 @@ public class FoodSearchRepositoy : IFoodSearchRepository
 
         // PostgreSQL Search for postcode
         return await _dbContext.Foods
+            .OpenForOrders()
             .Include("FoodImages")
             .Where(f => f.Seller.Addresses.Any(a => EF.Functions.ILike(a.PostCode, $"%{foodSearchTerm}%") && a.IsPrimary))
             .ToListAsync();

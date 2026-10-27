@@ -15,8 +15,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodListAsync(Point location, double? radius)
         {
-            var baseQuery = dbContext.Foods
-                .Where(f => f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59));
+            var baseQuery = dbContext.Foods.OpenForOrders();
 
             if (location != null && radius != null)
             {
@@ -59,7 +58,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
 
         public async Task<List<Food>> GetFoodByCategoryIdAsync(Guid categoryId)
         {
-            var food = await dbContext.Foods.Include("Category").Include("FoodImages").Where(f => f.CategoryId == categoryId && f.AvailableDate > DateTime.UtcNow.Date.AddHours(23).AddMinutes(59).AddSeconds(59)).ToListAsync();
+            var food = await dbContext.Foods.Include("Category").Include("FoodImages").OpenForOrders().Where(f => f.CategoryId == categoryId).ToListAsync();
             return food;
         }
 
