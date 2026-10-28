@@ -15,7 +15,5 @@ namespace HomeCook.Api.Dtos
         public required Guid SellerId { get; set; }
         public List<FoodImageDto> FoodImages { get; set; }
         public required Guid CategoryId { get; set; }
-        public required string PostCode { get; set; }
-
     }
 }
