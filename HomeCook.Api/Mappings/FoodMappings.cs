@@ -17,8 +17,7 @@ namespace HomeCook.Api.Mappings
             QuantityAvailable = food.QuantityAvailable,
             SellerId = food.SellerId,
             FoodImages = food.FoodImages?.Select(image => image.ToDto()).ToList() ?? [],
-            CategoryId = food.CategoryId,
-            PostCode = food.Seller?.Addresses.FirstOrDefault(address => address.IsPrimary)?.PostCode!
+            CategoryId = food.CategoryId
         };
 
         public static FoodDetailDto ToDetailDto(this Food food) => new()
@@ -34,8 +33,7 @@ namespace HomeCook.Api.Mappings
             SellerId = food.SellerId,
             FoodImages = food.FoodImages?.Select(image => image.ToDto()).ToList() ?? [],
             Category = food.Category.ToDto(),
-            CategoryId = food.CategoryId,
-            PostCode = food.Seller?.Addresses.FirstOrDefault(address => address.IsPrimary)?.PostCode!
+            CategoryId = food.CategoryId
         };
 
         public static Food ToModel(this CreateFoodDto dto, Guid sellerId) => new()
