@@ -10,7 +10,7 @@ namespace HomeCook.Api.EntityFramework.Repositories
         Task<Food?> GetFoodDetailAsync(Guid foodId);
         Task<List<Food>> GetFoodByCategoryIdAsync(Guid categoryId);
         Task<Food> AddFoodAsync(Food food);
-        Task<Food?> DeleteFoodByIdAsync(Guid foodId, string loggedInUserId);
+        Task<Food> DeleteFoodAsync(Food food);
         Task<Food?> UpdateFoodAsync(Food updateFood);
     }
 }

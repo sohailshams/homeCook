@@ -6,7 +6,6 @@ using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 
 namespace HomeCook.Api.Services
 {
@@ -16,25 +15,25 @@ namespace HomeCook.Api.Services
         public readonly ICategoryService _categoryService;
         public readonly IUserRepository _userRepository;
         private readonly ICategoryReposity _categoryReposity;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Cloudinary _cloudinary;
         private readonly IPostcodeService _postcodeService;
+        private readonly ICurrentUserService _currentUserService;
 
         public FoodService(IFoodRepository foodRepository,
                             ICategoryService categoryService,
                             IUserRepository userRepository,
                             ICategoryReposity categoryReposity,
-                            IHttpContextAccessor httpContextAccessor,
                             Cloudinary cloudinary,
-                            IPostcodeService postcodeService)
+                            IPostcodeService postcodeService,
+                            ICurrentUserService currentUserService)
         {
             _foodRepository = foodRepository;
             _categoryService = categoryService;
             _userRepository = userRepository;
             _categoryReposity = categoryReposity;
-            _httpContextAccessor = httpContextAccessor;
             _cloudinary = cloudinary;
             _postcodeService = postcodeService;
+            _currentUserService = currentUserService;
         }
 
         public async Task<List<FoodDto>> GetFoodListAsync(string postCode, double? radius)
@@ -81,15 +80,10 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-
-                if (!Guid.TryParse(loggedInUserId, out Guid parsedLoggedInUserId))
-                {
-                    throw new UnauthorizedAccessException("Unauthorized user.");
-                }
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
 
                 // Convert addFoodDto to model - the seller is always the logged-in user
-                var foodModel = addFoodDto.ToModel(parsedLoggedInUserId);
+                var foodModel = addFoodDto.ToModel(loggedInUserId);
                 ValidateOrderDeadline(foodModel.AvailableDate, foodModel.OrderDeadline);
                 if (foodModel.OrderDeadline <= DateTime.UtcNow)
                 {
@@ -99,7 +93,7 @@ namespace HomeCook.Api.Services
                 var category = await _categoryReposity.GetCategoryByIdAsync(foodModel.CategoryId) ?? throw new NotFoundException($"Category with ID {addFoodDto.CategoryId} not found.");
                 foodModel.Category = category;
 
-                var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {parsedLoggedInUserId} not found.");
+                var seller = await _userRepository.GetUserByIdAsync(foodModel.SellerId) ?? throw new NotFoundException($"Seller with ID {loggedInUserId} not found.");
                 if (seller.IsProfileComplete != true)
                 {
                     throw new ValidationException("User Profile must be completed before listing food.");
@@ -129,11 +123,11 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
 
                 var existingFood = await _foodRepository.GetFoodDetailAsync(foodId) ?? throw new NotFoundException("Food not found.");
 
-                if (existingFood.SellerId.ToString() != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
+                if (existingFood.SellerId != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to update this food item."); }
 
                 existingFood.Name = foodUpdate.Name;
                 existingFood.Description = foodUpdate.Description;
@@ -176,9 +170,13 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
 
-                var food = await _foodRepository.DeleteFoodByIdAsync(foodId, loggedInUserId) ?? throw new NotFoundException("Food not found.");
+                var existingFood = await _foodRepository.GetFoodDetailAsync(foodId) ?? throw new NotFoundException("Food not found.");
+
+                if (existingFood.SellerId != loggedInUserId) { throw new UnauthorizedAccessException("You are not authorized to delete this food item."); }
+
+                var food = await _foodRepository.DeleteFoodAsync(existingFood);
                 // Map Food model to FoodDto
                 var foodDto = food.ToDto();
                 return foodDto;

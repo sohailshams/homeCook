@@ -5,22 +5,21 @@ using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace HomeCook.Api.Services
 {
     public class UserService : IUserService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
         private readonly UserManager<User> _userManager;
 
-        public UserService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository, IUserAddressRepository userAddressRepository, UserManager<User> userManager)
+        public UserService(ICurrentUserService currentUserService, IUserRepository userRepository, IUserAddressRepository userAddressRepository, UserManager<User> userManager)
         {
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;
-            _httpContextAccessor = httpContextAccessor;
+            _currentUserService = currentUserService;
             _userManager = userManager;
         }
 
@@ -28,8 +27,7 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-                var loggedInUserId = Guid.Parse(loggedInUserIdString);
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
                 var user = await _userRepository.GetUserByIdAsync(loggedInUserId);
                 if (user == null)
                 {
@@ -50,7 +48,7 @@ namespace HomeCook.Api.Services
                 return userAndPostCodeInfoDto;
 
             }
-            catch (Exception exception) when (exception is not NotFoundException)
+            catch (Exception exception) when (exception is not NotFoundException and not UnauthorizedAccessException)
             {
                 throw new DatabaseOperationException("An unexpected error occurred while retrieving user profile.", exception);
             }
@@ -60,8 +58,7 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-                var loggedInUserId = Guid.Parse(loggedInUserIdString);
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
                 var user = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException("User not found.");
 
                 // Map user model to UserInfoDto

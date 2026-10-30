@@ -3,26 +3,25 @@ using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Mappings;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace HomeCook.Api.Services
 {
     public class UserProfileService : IUserProfileService
     {
         private readonly IUserProfileRepository _userProfileRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
         private readonly IPostcodeService _postcodeService;
 
         public UserProfileService(IUserProfileRepository userProfileRepository,
-            IHttpContextAccessor httpContextAccessor,
+            ICurrentUserService currentUserService,
             IUserRepository userRepository,
             IUserAddressRepository userAddressRepository,
             IPostcodeService postcodeService)
         {
             _userProfileRepository = userProfileRepository;
-            _httpContextAccessor = httpContextAccessor;
+            _currentUserService = currentUserService;
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;
             _postcodeService = postcodeService;
@@ -53,11 +52,7 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = GetLoggedInUserId();
-                if (loggedInUserId != addUpdateProfileDto.UserId)
-                {
-                    throw new UnauthorizedAccessException("You are not authorized to add profile information in database.");
-                }
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
 
                 _ = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException($"User with ID {loggedInUserId} not found.");
 
@@ -79,11 +74,7 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserId = GetLoggedInUserId();
-                if (loggedInUserId != updateProfile.UserId)
-                {
-                    throw new UnauthorizedAccessException("You are not authorized to update profile information in database.");
-                }
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
 
                 var existingProfile = await _userProfileRepository.GetUserProfileByIdAsync(loggedInUserId)
                     ?? throw new NotFoundException($"Profile with ID {loggedInUserId} was not found.");
@@ -114,16 +105,6 @@ namespace HomeCook.Api.Services
             {
                 throw new DatabaseOperationException("Failed to update profile information.", exception);
             }
-        }
-
-        private Guid GetLoggedInUserId()
-        {
-            var loggedInUserIdString = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!Guid.TryParse(loggedInUserIdString, out var loggedInUserId))
-            {
-                throw new UnauthorizedAccessException("Unauthorized user.");
-            }
-            return loggedInUserId;
         }
     }
 }

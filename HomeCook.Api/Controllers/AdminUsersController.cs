@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using HomeCook.Api.Constants;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Models;
+using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,15 +17,18 @@ namespace HomeCook.Api.Controllers
         private readonly ILogger<AdminUsersController> _logger;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly ICurrentUserService _currentUserService;
 
         public AdminUsersController(
             ILogger<AdminUsersController> logger,
             UserManager<User> userManager,
-            RoleManager<IdentityRole<Guid>> roleManager)
+            RoleManager<IdentityRole<Guid>> roleManager,
+            ICurrentUserService currentUserService)
         {
             _logger = logger;
             _userManager = userManager;
             _roleManager = roleManager;
+            _currentUserService = currentUserService;
         }
 
         [HttpGet("{userId:guid}/roles")]
@@ -50,14 +53,14 @@ namespace HomeCook.Api.Controllers
             // Forces the user's cookie to pick up the new role on the next validation
             await _userManager.UpdateSecurityStampAsync(user);
 
-            _logger.LogInformation($"Admin {GetLoggedInUserId()} granted role {role} to user {userId}");
+            _logger.LogInformation($"Admin {_currentUserService.GetCurrentUserId()} granted role {role} to user {userId}");
             return NoContent();
         }
 
         [HttpDelete("{userId:guid}/roles/{role}")]
         public async Task<IActionResult> RemoveRole([FromRoute] Guid userId, [FromRoute] string role)
         {
-            if (string.Equals(role, Roles.Admin, StringComparison.OrdinalIgnoreCase) && userId == GetLoggedInUserId())
+            if (string.Equals(role, Roles.Admin, StringComparison.OrdinalIgnoreCase) && userId == _currentUserService.GetCurrentUserId())
                 throw new ValidationException("You cannot remove your own admin role.");
 
             var user = await FindUserAsync(userId);
@@ -68,7 +71,7 @@ namespace HomeCook.Api.Controllers
 
             await _userManager.UpdateSecurityStampAsync(user);
 
-            _logger.LogInformation($"Admin {GetLoggedInUserId()} removed role {role} from user {userId}");
+            _logger.LogInformation($"Admin {_currentUserService.GetCurrentUserId()} removed role {role} from user {userId}");
             return NoContent();
         }
 
@@ -76,12 +79,6 @@ namespace HomeCook.Api.Controllers
         {
             return await _userManager.FindByIdAsync(userId.ToString())
                    ?? throw new NotFoundException($"User with ID {userId} not found.");
-        }
-
-        private Guid GetLoggedInUserId()
-        {
-            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return Guid.TryParse(id, out var parsedId) ? parsedId : Guid.Empty;
         }
     }
 }

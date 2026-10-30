@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 using HomeCook.Api.Models;
 using HomeCook.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,14 +13,17 @@ namespace HomeCook.Api.Controllers
     {
         private readonly ILogger<CreatePaymentIntentController> _logger;
         private readonly IFoodService _foodService;
+        private readonly ICurrentUserService _currentUserService;
 
         public CreatePaymentIntentController(
             ILogger<CreatePaymentIntentController> logger,
-            IFoodService foodService
+            IFoodService foodService,
+            ICurrentUserService currentUserService
             )
         {
             _logger = logger;
             _foodService = foodService;
+            _currentUserService = currentUserService;
         }
 
         [HttpPost]
@@ -44,7 +46,7 @@ namespace HomeCook.Api.Controllers
             // Stripe expects the amount in the smallest currency unit (pence)
             var amountInPence = (long)Math.Round(food.Price * itemData.Quantity * 100m, MidpointRounding.AwayFromZero);
 
-            var buyerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var buyerId = _currentUserService.GetCurrentUserId();
 
             var options = new PaymentIntentCreateOptions
             {
@@ -57,7 +59,7 @@ namespace HomeCook.Api.Controllers
                 {
                     { "quantity", itemData.Quantity.ToString() },
                     { "foodId", itemData.FoodId.ToString() },
-                    { "buyerId", buyerId ?? string.Empty }
+                    { "buyerId", buyerId.ToString() }
                 }
             };
 

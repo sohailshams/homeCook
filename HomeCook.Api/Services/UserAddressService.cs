@@ -3,23 +3,22 @@ using HomeCook.Api.EntityFramework.Repositories;
 using HomeCook.Api.Exceptions;
 using HomeCook.Api.Mappings;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace HomeCook.Api.Services
 {
     public class UserAddressService : IUserAddressService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;
         private readonly IUserAddressRepository _userAddressRepository;
         private readonly IPostcodeService _postcodeService;
 
-        public UserAddressService(IHttpContextAccessor httpContextAccessor,
+        public UserAddressService(ICurrentUserService currentUserService,
             IUserRepository userRepository,
             IUserAddressRepository userAddressRepository,
             IPostcodeService postcodeService)
         {
-            _httpContextAccessor = httpContextAccessor;
+            _currentUserService = currentUserService;
             _userRepository = userRepository;
             _userAddressRepository = userAddressRepository;
             _postcodeService = postcodeService;
@@ -29,18 +28,9 @@ namespace HomeCook.Api.Services
         {
             try
             {
-                var loggedInUserIdString = (_httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value) ?? throw new UnauthorizedAccessException("Unauthorized user.");
-                if (!Guid.TryParse(loggedInUserIdString, out var loggedInUserId))
-                {
-                    throw new UnauthorizedAccessException("Unauthorized user.");
-                }
+                var loggedInUserId = _currentUserService.GetCurrentUserId();
 
-                var user = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException($"User with ID {loggedInUserId} not found.");
-
-                if (user.Id != loggedInUserId)
-                {
-                    throw new UnauthorizedAccessException("Unauthorized user.");
-                }
+                _ = await _userRepository.GetUserByIdAsync(loggedInUserId) ?? throw new NotFoundException($"User with ID {loggedInUserId} not found.");
 
                 var location = await _postcodeService.GetLocationAsync(addressRequestDto.PostCode);
 
