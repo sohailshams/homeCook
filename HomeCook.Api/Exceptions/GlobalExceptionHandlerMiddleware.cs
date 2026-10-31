@@ -6,10 +6,12 @@ namespace HomeCook.Api.Exceptions
     public class GlobalExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<GlobalExceptionHandlerMiddleware> _logger;
 
-        public GlobalExceptionHandlerMiddleware(RequestDelegate next)
+        public GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlerMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -60,6 +62,11 @@ namespace HomeCook.Api.Exceptions
                     errorMessage = dbEx.Message;
                     break;
 
+                case HttpRequestException:
+                    statusCode = StatusCodes.Status502BadGateway;
+                    errorMessage = "An external service is unavailable. Please try again.";
+                    break;
+
                 default:
                     statusCode = StatusCodes.Status500InternalServerError;
                     errorMessage = "An unexpected error occurred.";
@@ -72,6 +79,17 @@ namespace HomeCook.Api.Exceptions
                         ? stripeEx.StripeError!.Message
                         : "Payment service is unavailable. Please try again.";
                     break;
+            }
+
+            if (statusCode >= 500)
+            {
+                // Server side failure: log the full exception, stack trace and inner exception
+                _logger.LogError(exception, $"Unhandled exception for {context.Request.Method} {context.Request.Path}");
+            }
+            else
+            {
+                // Client error (400/401/404/409): expected, a short line is enough
+                _logger.LogWarning($"{statusCode} for {context.Request.Method} {context.Request.Path}: {exception.Message}");
             }
 
             context.Response.StatusCode = statusCode;
