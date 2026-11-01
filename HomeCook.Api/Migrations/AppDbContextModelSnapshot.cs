@@ -20,7 +20,7 @@ namespace HomeCook.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
@@ -64,7 +64,7 @@ namespace HomeCook.Api.Migrations
                         .IsUnique()
                         .HasFilter("\"IsPrimary\" = true");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Category", b =>
@@ -79,7 +79,7 @@ namespace HomeCook.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Food", b =>
@@ -136,7 +136,7 @@ namespace HomeCook.Api.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Foods");
+                    b.ToTable("Foods", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.FoodImage", b =>
@@ -160,7 +160,7 @@ namespace HomeCook.Api.Migrations
 
                     b.HasIndex("FoodId");
 
-                    b.ToTable("FoodImages");
+                    b.ToTable("FoodImages", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Order", b =>
@@ -194,7 +194,7 @@ namespace HomeCook.Api.Migrations
                     b.HasIndex("StripePaymentIntentId")
                         .IsUnique();
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.OrderItem", b =>
@@ -222,7 +222,7 @@ namespace HomeCook.Api.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.Profile", b =>
@@ -257,7 +257,7 @@ namespace HomeCook.Api.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Profiles");
+                    b.ToTable("Profiles", (string)null);
                 });
 
             modelBuilder.Entity("HomeCook.Api.Models.User", b =>
