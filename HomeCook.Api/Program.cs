@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Stripe;
 using CloudinaryDotNet;
+using Hangfire;
+using Hangfire.PostgreSql;
+using HomeCook.Api.Constants;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +41,7 @@ builder.Services.AddSwaggerGen(c =>
 
 StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString, o => o.UseNetTopologySuite()));
 
@@ -100,6 +104,20 @@ var cloudinary = new Cloudinary(cloudinaryUrl);
 cloudinary.Api.Secure = true;
 builder.Services.AddSingleton(cloudinary);
 
+// Background jobs (Stripe sync, image cleanup, email retries)
+// Jobs are stored in PostgreSQL in their own "hangfire" schema, which is created on first start.
+builder.Services.AddHangfire(configuration => configuration
+      .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+      .UseSimpleAssemblyNameTypeSerializer()
+      .UseRecommendedSerializerSettings()
+      .UsePostgreSqlStorage(options =>
+        options.UseNpgsqlConnection(connectionString),
+        // Check for new jobs once a minute instead of every 15 seconds, so an idle database can sleep
+        new PostgreSqlStorageOptions { QueuePollInterval = TimeSpan.FromMinutes(1) }));
+
+// Runs the jobs in the background inside this API process
+builder.Services.AddHangfireServer();
+
 builder.Services.AddScoped<ICategoryReposity, CategoryRepository>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IFoodRepository, FoodRepository>();
@@ -143,6 +161,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapGroup("api").MapIdentityApi<User>();
+
+// Job dashboard, admins only (uses the same cookie login and roles as the API)
+app.MapHangfireDashboard("/hangfire", new DashboardOptions
+{
+    // Turn off Hangfire's own check (local requests only) and let ASP.NET Core decide
+    Authorization = []
+})
+.RequireAuthorization(policy => policy.RequireRole(Roles.Admin));
 
 app.MapControllers();
 
